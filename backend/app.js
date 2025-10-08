@@ -47,7 +47,11 @@ const app = express();
 
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: ['https://test.supemir.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 app.use(express.json());
 app.use('/documents', express.static('documents'));
 function genererLienLive(nomCours) {
