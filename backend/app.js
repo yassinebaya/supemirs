@@ -45,13 +45,15 @@ const authAdminOrPaiementManager = require('./middlewares/authAdminOrPaiementMan
 
 const app = express();
 
-
-// Middlewares
 app.use(cors({
-  origin: ['https://test.supemir.com'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: ['https://test.supemir.com'], // domaine autorisé
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // inclut OPTIONS
+  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
   credentials: true,
 }));
+
+// Répondre manuellement aux pré-requêtes OPTIONS
+app.options('*', cors());
 app.use(express.json());
 app.use('/documents', express.static('documents'));
 function genererLienLive(nomCours) {
