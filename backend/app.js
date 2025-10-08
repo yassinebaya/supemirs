@@ -53,7 +53,7 @@ app.use(cors({
 }));
 
 // Répondre manuellement aux pré-requêtes OPTIONS
-app.options('*', cors());
+
 app.use(express.json());
 app.use('/documents', express.static('documents'));
 function genererLienLive(nomCours) {
