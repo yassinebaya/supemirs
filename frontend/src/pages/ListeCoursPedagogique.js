@@ -91,10 +91,6 @@ const ListeCoursPedagogique = () => {
     const etudiantsAccessibles = getEtudiantsAccessibles();
     
     return etudiantsAccessibles.filter(e => {
-      if (e.prixTotal === 0 || e.prixTotal === null || e.prixTotal === undefined) {
-        return false;
-      }
-      
       if (e.anneeScolaire !== '2025/2026') {
         return false;
       }
@@ -248,11 +244,6 @@ const ListeCoursPedagogique = () => {
 
   const etudiantsDansCours = coursActuel
     ? getEtudiantsAccessibles().filter(e => {
-        // Appliquer les mêmes filtres que getNombreEtudiants
-        if (e.prixTotal === 0 || e.prixTotal === null || e.prixTotal === undefined) {
-          return false;
-        }
-        
         if (e.anneeScolaire !== '2025/2026') {
           return false;
         }

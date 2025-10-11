@@ -118,6 +118,8 @@ const GestionCoursPedagogique = () => {
   const filtrerEtudiants = () => {
     let resultats = etudiants;
 
+    // Pas de filtre sur prixTotal - tous les étudiants sont affichés
+
     if (recherche) {
       resultats = resultats.filter(e => {
         const nomComplet = `${e.prenom} ${e.nomDeFamille}`.toLowerCase();

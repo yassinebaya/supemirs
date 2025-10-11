@@ -1765,69 +1765,95 @@ const EmploiPedagogique = () => {
       {/* Modal pour configurer les créneaux */}
       <ModalCreneaux />
 
-      {/* Modal Statistiques Rattrapages */}
-      {showStatsRattrapages && (
-        <div className="modal-overlay">
-          <div className="modal-content-large">
-            <h3>📊 Statistiques des Rattrapages</h3>
-            
-            {loadingStats ? (
-              <div className="loading-stats">
-                <div>Chargement des statistiques...</div>
+ {/* Modal Statistiques Rattrapages */}
+{showStatsRattrapages && (
+  <div className="modal-overlay" onClick={() => setShowStatsRattrapages(false)}>
+    <div className="modal-content-large" onClick={(e) => e.stopPropagation()}>
+      {/* AJOUT: Header avec bouton de fermeture */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '1.5rem',
+        paddingBottom: '1rem',
+        borderBottom: '2px solid #e5e7eb'
+      }}>
+        <h3 style={{ margin: 0 }}>📊 Statistiques des Rattrapages</h3>
+        <button
+          onClick={() => setShowStatsRattrapages(false)}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            fontSize: '1.5rem',
+            cursor: 'pointer',
+            padding: '0.5rem',
+            color: '#6b7280',
+            transition: 'color 0.2s ease'
+          }}
+          onMouseOver={(e) => e.target.style.color = '#ef4444'}
+          onMouseOut={(e) => e.target.style.color = '#6b7280'}
+          title="Fermer"
+        >
+          ✕
+        </button>
+      </div>
+      
+      {loadingStats ? (
+        <div className="loading-stats">
+          <div>Chargement des statistiques...</div>
+        </div>
+      ) : (
+        <div>
+          {statsRattrapages.map(stat => (
+            <div key={stat._id} className={`stat-card ${stat.seancesRattrapage > 0 ? 'has-rattrapage' : ''}`}>
+              <div className="stat-header">
+                {stat.nomProfesseur}
               </div>
-            ) : (
-              <div>
-                {statsRattrapages.map(stat => (
-                  <div key={stat._id} className={`stat-card ${stat.seancesRattrapage > 0 ? 'has-rattrapage' : ''}`}>
-                    <div className="stat-header">
-                      {stat.nomProfesseur}
-                    </div>
-                    
-                    <div className="stat-grid">
-                      <div className="stat-item">
-                        <div className="stat-label">Total séances:</div>
-                        <div className="stat-value">{stat.totalSeances}</div>
-                      </div>
-                      <div className="stat-item">
-                        <div className="stat-label">Séances normales:</div>
-                        <div className="stat-value normal">{stat.seancesNormales}</div>
-                      </div>
-                      <div className="stat-item">
-                        <div className="stat-label">Rattrapages requis:</div>
-                        <div className="stat-value rattrapage">{stat.seancesRattrapage}</div>
-                      </div>
-                    </div>
-                    
-                    {stat.totalSeances > 0 && (
-                      <div className="stat-taux">
-                        <span>Taux de présence: <strong>{Math.round((stat.seancesNormales / stat.totalSeances) * 100)}%</strong></span>
-                        <span>Taux de rattrapage: <strong className="rattrapage">{stat.pourcentageRattrapages || Math.round((stat.seancesRattrapage / stat.totalSeances) * 100)}%</strong></span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-                
-                {statsRattrapages.length === 0 && (
-                  <div className="empty-stats">
-                    <div>📊</div>
-                    <div>Aucune donnée de rattrapage disponible</div>
-                  </div>
-                )}
+              
+              <div className="stat-grid">
+                <div className="stat-item">
+                  <div className="stat-label">Total séances:</div>
+                  <div className="stat-value">{stat.totalSeances}</div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-label">Séances normales:</div>
+                  <div className="stat-value normal">{stat.seancesNormales}</div>
+                </div>
+                <div className="stat-item">
+                  <div className="stat-label">Rattrapages requis:</div>
+                  <div className="stat-value rattrapage">{stat.seancesRattrapage}</div>
+                </div>
               </div>
-            )}
-            
-            <div className="modal-footer">
-              <button
-                onClick={() => setShowStatsRattrapages(false)}
-                className="modal-button cancel"
-              >
-                Fermer
-              </button>
+              
+              {stat.totalSeances > 0 && (
+                <div className="stat-taux">
+                  <span>Taux de présence: <strong>{Math.round((stat.seancesNormales / stat.totalSeances) * 100)}%</strong></span>
+                  <span>Taux de rattrapage: <strong className="rattrapage">{stat.pourcentageRattrapages || Math.round((stat.seancesRattrapage / stat.totalSeances) * 100)}%</strong></span>
+                </div>
+              )}
             </div>
-          </div>
+          ))}
+          
+          {statsRattrapages.length === 0 && (
+            <div className="empty-stats">
+              <div>📊</div>
+              <div>Aucune donnée de rattrapage disponible</div>
+            </div>
+          )}
         </div>
       )}
-
+      
+      <div className="modal-footer">
+        <button
+          onClick={() => setShowStatsRattrapages(false)}
+          className="modal-button cancel"
+        >
+          Fermer
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       {/* Modal Historique */}
       <HistoriqueModal
         show={showHistorique}

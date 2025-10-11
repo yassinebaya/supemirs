@@ -3,6 +3,8 @@ import React, { useEffect } from 'react';
 import { Download } from 'lucide-react';
 
 // Import des pages
+import AssignerLangues from './pages/AssignerLangues';
+
 import AdminTestsLangue from './pages/AdminTestsLangue';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -208,6 +210,7 @@ import ModifierCoursEtudiant from './pages/ModifierCoursEtudiant';
 <Route path="/admin/revenus-mensuels" element={<RevenusMensuels />} />
 <Route path="/commercial" element={<Commercial />} />
 
+<Route path="/assigner-langues" element={<AssignerLangues />} />
 
 <Route path="/pedagogique/etudiants" element={<PedagogiqueEtudiants />} />
 <Route path="/professeur/AjouterBulletin" element={<ProfAjouterBulletin />} />
@@ -231,7 +234,6 @@ import ModifierCoursEtudiant from './pages/ModifierCoursEtudiant';
 
 <Route path="/admin/pedagogiques" element={<PedagogiePage />} />
 
-<Route path="/admin/partners" element={<PartnersPage />} />
 
 
 <Route path="/commercial/etudiant" element={<Commercialetudiants />} />
@@ -267,7 +269,6 @@ import ModifierCoursEtudiant from './pages/ModifierCoursEtudiant';
         <Route path="/finance/listeprofesseurs" element={<ListeProfesseursfinance />} />
 
         <Route path="/pedagogique/professeurs" element={<PedagogiePageprof />} />
-        <Route path="/admin/dashboard-partners" element={<DashboardPartners />} />
 
 <Route path="/admin/tests-langue" element={<AdminTestsLangue />} />
 <Route 

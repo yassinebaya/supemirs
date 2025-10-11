@@ -753,7 +753,7 @@ const SeancesProfesseur = () => {
               <div style={styles.statCard}>
                 <div style={styles.statNumber}>{stats.totalCours}</div>
                 <div style={styles.statLabel}>
-                  Cours différents
+                  Classes différents
                 </div>
               </div>
               <div style={styles.statCard}>
@@ -1009,7 +1009,7 @@ const SeancesProfesseur = () => {
                   <div style={styles.statCard}>
                     <div style={styles.statNumber}>{statistiques.statistiques.coursUniques}</div>
                     <div style={styles.statLabel}>
-                      Cours Différents
+                      Classes Différents
                     </div>
                   </div>
                   <div style={styles.statCard}>
@@ -1087,7 +1087,7 @@ const SeancesProfesseur = () => {
             <th style={styles.headerCell}>Date</th>
             <th style={styles.headerCell}>Jour</th>
             <th style={styles.headerCell}>Horaire</th>
-            <th style={styles.headerCell}>Cours</th>
+            <th style={styles.headerCell}>Classe</th>
             <th style={styles.headerCell}>Matière</th>
             <th style={styles.headerCell}>Salle</th>
             <th style={styles.headerCell}>Durée</th>

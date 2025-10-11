@@ -125,41 +125,63 @@ const STEPS_CONFIG = {
   }
 };
 
-// Méthode pour calculer le niveau basé sur la première erreur
+// ===== NOUVELLE MÉTHODE calculerNiveau =====
 testSchema.methods.calculerNiveau = function() {
   const reponsesCorrectes = REPONSES_CORRECTES[this.langue];
   const steps = STEPS_CONFIG[this.langue];
   
   let score = 0;
-  let niveauFinal = this.langue === 'anglais' ? 'B2' : 'B2';
+  let niveauFinal = 'A1'; // Niveau par défaut
   let premiereErreur = { step: null, questionId: null };
+  let stepsPrecedentsCorrects = true;
   
-  // Parcourir toutes les questions dans l'ordre
+  // Parcourir tous les steps dans l'ordre
   for (let [stepName, stepConfig] of Object.entries(steps)) {
-    let erreurTrouvee = false;
+    let toutesReponsesCorrectes = true;
+    let toutesQuestionsRepondues = true;
     
+    // Vérifier toutes les questions de ce step
     for (let qId = stepConfig.debut; qId <= stepConfig.fin; qId++) {
       const reponseEtudiant = this.reponses.get(qId.toString());
       const reponseCorrecte = reponsesCorrectes[qId];
       
-      if (reponseEtudiant !== undefined) {
+      // Si la question n'est pas répondue
+      if (reponseEtudiant === undefined) {
+        toutesQuestionsRepondues = false;
+        toutesReponsesCorrectes = false;
+        
+        // Enregistrer la première erreur si ce n'est pas déjà fait
+        if (!premiereErreur.questionId) {
+          premiereErreur.step = stepName;
+          premiereErreur.questionId = qId;
+        }
+      } 
+      // Si la question est répondue
+      else {
         if (reponseEtudiant === reponseCorrecte) {
           score++;
         } else {
-          // PREMIÈRE ERREUR TROUVÉE
+          // Réponse incorrecte
+          toutesReponsesCorrectes = false;
+          
+          // Enregistrer la première erreur si ce n'est pas déjà fait
           if (!premiereErreur.questionId) {
             premiereErreur.step = stepName;
             premiereErreur.questionId = qId;
-            niveauFinal = stepConfig.niveau;
-            erreurTrouvee = true;
           }
         }
       }
     }
     
-    // Si erreur trouvée dans ce step, le niveau final est celui de ce step
-    if (erreurTrouvee) {
-      break;
+    // Déterminer si ce step est COMPLET et CORRECT
+    const stepCompletEtCorrect = toutesQuestionsRepondues && toutesReponsesCorrectes;
+    
+    // Si tous les steps précédents sont corrects ET ce step aussi
+    if (stepsPrecedentsCorrects && stepCompletEtCorrect) {
+      niveauFinal = stepConfig.niveau;
+    } else {
+      // Dès qu'un step n'est pas complet/correct, on arrête la progression
+      stepsPrecedentsCorrects = false;
     }
   }
   

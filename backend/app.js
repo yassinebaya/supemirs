@@ -45,15 +45,9 @@ const authAdminOrPaiementManager = require('./middlewares/authAdminOrPaiementMan
 
 const app = express();
 
-app.use(cors({
-  origin: ['https://test.supemir.com'], // domaine autorisé
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // inclut OPTIONS
-  allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
-  credentials: true,
-}));
 
-// Répondre manuellement aux pré-requêtes OPTIONS
-
+// Middlewares
+app.use(cors());
 app.use(express.json());
 app.use('/documents', express.static('documents'));
 function genererLienLive(nomCours) {
@@ -3435,9 +3429,18 @@ app.post('/api2/tests/:testId/terminer', authEtudiant, async (req, res) => {
       });
     }
     
-    // Terminer le test et calculer le niveau
+    // ===== APPEL DE LA NOUVELLE MÉTHODE calculerNiveau() =====
     const resultat = test.terminerTest();
     await test.save();
+    
+    // Log pour debug (vous pouvez enlever après les tests)
+    console.log('📊 Test terminé:', {
+      langue: test.langue,
+      niveau: resultat.niveau,
+      score: resultat.score,
+      totalQuestions: resultat.totalQuestions,
+      premiereErreur: resultat.premiereErreur
+    });
     
     // Vérifier si les deux tests sont terminés pour mettre à jour nouvelleInscription
     const statutTests = await Test.aTermineLesDeuxTests(req.etudiantId);
@@ -3456,7 +3459,7 @@ app.post('/api2/tests/:testId/terminer', authEtudiant, async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Erreur terminaison test:', error);
+    console.error('❌ Erreur terminaison test:', error);
     res.status(500).json({ 
       success: false, 
       message: 'Erreur lors de la terminaison du test', 
@@ -11390,28 +11393,29 @@ app.get('/api2/presences/etudiant/:id', authAdminOrPaiementManager, async (req, 
 // Route pour "Gestion des Étudiants"
 
 // Route pour "Gestion des Cours"
+// ============================================
+// ROUTE: Mes Étudiants (Pédagogique) - SANS FILTRE PRIX
+// ============================================
 app.get('/api2/pedagogique/mes-etudiants', authPedagogique, async (req, res) => {
   try {
     const estGeneral = req.user.estGeneral;
     
+    // ✅ Query simplifiée : Seulement année scolaire
     let query = {
-      anneeScolaire: '2025/2026',
-      prixTotal: { 
-        $exists: true,  // Le champ existe
-        $ne: null,      // N'est pas null
-        $gt: 0          // Strictement supérieur à 0
-      }
+      anneeScolaire: '2025/2026'
     };
     
+    // Si pas général, filtrer par filière
     if (!estGeneral) {
       query.filiere = req.user.filiere;
     }
     
+    // Récupérer TOUS les étudiants de 2025/2026 (avec ou sans prixTotal)
     const etudiants = await Etudiant.find(query)
       .populate('commercial', 'nom nomComplet')
       .sort({ createdAt: -1 });
 
-    console.log(`📚 Gestion Cours - ${etudiants.length} étudiants (2025/2026, prix > 0)`);
+    console.log(`📚 Gestion Cours - ${etudiants.length} étudiants (2025/2026, TOUS)`);
     
     res.json(etudiants);
   } catch (error) {
@@ -11716,10 +11720,37 @@ app.get('/api2/paiements/etudiant/:etudiantId', authAdminOrPaiementManager, asyn
 // Récupérer un seul cours avec détails
 // 📌 Route: GET /api2/cours/:id
 // ✅ Lister tous les cours (IMPORTANT!)
-app.get('/api2/cours', authAdminOrPaiementManager  , async (req, res) => {
+app.get('/api2/cours', authAdminOrPaiementManager, async (req, res) => {
   try {
-    const cours = await Cours.find();
+    // ✅ EXCLURE les cours de langue
+    const cours = await Cours.find({ 
+      estLangue: { $ne: true } 
+    }).sort({ nom: 1 });
+    
     res.json(cours);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// Script de migration à exécuter dans MongoDB ou via une route temporaire
+app.post('/api2/cours/marquer-langues', authAdmin, async (req, res) => {
+  try {
+    // Liste des noms de cours de langue
+    const coursLangues = [
+      'Français A1', 'Français A2', 'Français B1', 'Français B2',
+      'Anglais A1', 'Anglais A2', 'Anglais B1', 'Anglais B2'
+    ];
+    
+    // Mettre à jour tous les cours de langue
+    const result = await Cours.updateMany(
+      { nom: { $in: coursLangues } },
+      { $set: { estLangue: true } }
+    );
+    
+    res.json({ 
+      success: true, 
+      message: `${result.modifiedCount} cours marqués comme langue` 
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -12633,21 +12664,84 @@ app.get('/api2/paiements/etudiant/:etudiantId/info', authAdminOrPaiementManager,
   }
 });
 
-// API POST inchangée
 app.post('/api2/paiements', authAdminOrPaiementManager, async (req, res) => {
   try {
-    const { etudiant, cours, moisDebut, nombreMois, montant, note, estInscription, typePaiement } = req.body;
-    const coursArray = Array.isArray(cours) ? cours : [cours];
+    // 🔍 LOG 1: Afficher les données reçues
+    console.log('📥 ===== DÉBUT CRÉATION PAIEMENT =====');
+    console.log('📦 Body reçu:', JSON.stringify(req.body, null, 2));
+    console.log('👤 Admin ID:', req.adminId);
+    
+    const { etudiant, cours, moisDebut, nombreMois, montant, note, estInscription, typePaiement, numeroSerie } = req.body;
+    
+    // ✅ VALIDATION 1: Vérifier si le numéro de série est fourni
+    if (!numeroSerie || numeroSerie.trim() === '') {
+      console.log('❌ ERREUR: Numéro de série manquant');
+      return res.status(400).json({ 
+        error: 'Le numéro de série est obligatoire' 
+      });
+    }
+
+    // ✅ VALIDATION 2: Vérifier si l'étudiant est fourni
+    if (!etudiant || etudiant.trim() === '') {
+      console.log('❌ ERREUR: Étudiant manquant');
+      return res.status(400).json({ 
+        error: 'L\'identifiant de l\'étudiant est obligatoire' 
+      });
+    }
+
+    // ✅ VALIDATION 3: Vérifier le montant
+    if (!montant || parseFloat(montant) <= 0) {
+      console.log('❌ ERREUR: Montant invalide');
+      return res.status(400).json({ 
+        error: 'Le montant doit être supérieur à 0' 
+      });
+    }
+
+    // 🔍 LOG 2: Vérification unicité du numéro de série
+    console.log('🔍 Vérification unicité du numéro de série:', numeroSerie);
+    const serieExiste = await Paiement.findOne({ 
+      numeroSerie: numeroSerie.trim().toUpperCase() 
+    });
+    
+    if (serieExiste) {
+      console.log('❌ ERREUR: Numéro de série déjà utilisé');
+      return res.status(400).json({ 
+        error: `Ce numéro de série (${numeroSerie}) est déjà utilisé pour un autre paiement`,
+        paiementExistant: {
+          etudiant: serieExiste.etudiant,
+          montant: serieExiste.montant,
+          date: serieExiste.createdAt
+        }
+      });
+    }
+    console.log('✅ Numéro de série disponible');
+
+    // 🔍 LOG 3: Vérification existence de l'étudiant
+    console.log('🔍 Recherche de l\'étudiant:', etudiant);
+    const etudiantDoc = await Etudiant.findById(etudiant);
+    if (!etudiantDoc) {
+      console.log('❌ ERREUR: Étudiant non trouvé');
+      return res.status(404).json({ 
+        error: 'Étudiant non trouvé' 
+      });
+    }
+    console.log('✅ Étudiant trouvé:', etudiantDoc.nomComplet || `${etudiantDoc.prenom} ${etudiantDoc.nomDeFamille}`);
+
+    // Traitement des cours
+    const coursArray = Array.isArray(cours) ? cours : (cours ? [cours] : []);
+    console.log('📚 Cours associés:', coursArray);
 
     // Déterminer le type de paiement
     let typePaymentFinal = typePaiement || 'formation';
     if (estInscription === true) {
       typePaymentFinal = 'inscription';
     }
+    console.log('💳 Type de paiement final:', typePaymentFinal);
 
     // Calculer le numéro de tranche SEULEMENT pour les paiements de formation
     let numeroTranche = null;
     if (typePaymentFinal === 'formation') {
+      console.log('🔍 Calcul du numéro de tranche...');
       const paiementsFormationExistants = await Paiement.find({
         etudiant,
         $or: [
@@ -12656,24 +12750,36 @@ app.post('/api2/paiements', authAdminOrPaiementManager, async (req, res) => {
         ]
       });
       numeroTranche = paiementsFormationExistants.length + 1;
+      console.log('📊 Numéro de tranche:', numeroTranche);
     }
 
-    const paiement = new Paiement({
+    // Préparer les données du paiement
+    const paiementData = {
       etudiant,
       cours: coursArray,
       moisDebut: new Date(moisDebut || Date.now()),
       nombreMois: nombreMois || (typePaymentFinal === 'inscription' ? 0 : 1),
-      montant,
-      note,
+      montant: parseFloat(montant),
+      note: note || '',
+      numeroSerie: numeroSerie.trim().toUpperCase(),
       typePaiement: typePaymentFinal,
       estInscription: typePaymentFinal === 'inscription',
       numeroTranche: numeroTranche,
       creePar: req.adminId
-    });
+    };
 
+    console.log('📝 Création du paiement avec les données:', JSON.stringify(paiementData, null, 2));
+
+    // Créer le paiement
+    const paiement = new Paiement(paiementData);
+
+    // 🔍 LOG 4: Tentative de sauvegarde
+    console.log('💾 Tentative de sauvegarde du paiement...');
     await paiement.save();
+    console.log('✅ Paiement sauvegardé avec succès, ID:', paiement._id);
 
     // Calcul pour marquer l'étudiant comme payé
+    console.log('📊 Calcul des totaux payés...');
     const paiementsFormation = await Paiement.find({ 
       etudiant, 
       $or: [
@@ -12689,43 +12795,397 @@ app.post('/api2/paiements', authAdminOrPaiementManager, async (req, res) => {
       ]
     });
     
-    const totalPayeFormation = paiementsFormation.reduce((acc, p) => acc + p.montant, 0);
-    const totalInscription = paiementsInscription.reduce((acc, p) => acc + p.montant, 0);
+    const totalPayeFormation = paiementsFormation.reduce((acc, p) => acc + (p.montant || 0), 0);
+    const totalInscription = paiementsInscription.reduce((acc, p) => acc + (p.montant || 0), 0);
+    
+    console.log('💰 Total formation payé:', totalPayeFormation);
+    console.log('💰 Total inscription payé:', totalInscription);
 
     // Mise à jour du statut de l'étudiant
-    const etudiantDoc = await Etudiant.findById(etudiant);
-    if (etudiantDoc) {
-      if (etudiantDoc.modePaiement === 'annuel') {
-        // Pour mode annuel : ne pas modifier automatiquement
+    const montantFormationRequis = Math.max(0, etudiantDoc.prixTotal - totalInscription);
+    console.log('💰 Montant formation requis:', montantFormationRequis);
+
+    if (etudiantDoc.modePaiement === 'annuel') {
+      console.log('ℹ️ Mode annuel: pas de mise à jour automatique du statut');
+    } else {
+      const ancienStatut = etudiantDoc.paye;
+      
+      if (totalPayeFormation >= montantFormationRequis) {
+        etudiantDoc.paye = true;
       } else {
-        // Calculer le montant formation requis après inscription
-        const montantFormationRequis = Math.max(0, etudiantDoc.prixTotal - totalInscription);
-        
-        if (totalPayeFormation >= montantFormationRequis) {
-          etudiantDoc.paye = true;
-        } else {
-          etudiantDoc.paye = false;
-        }
+        etudiantDoc.paye = false;
+      }
+      
+      if (ancienStatut !== etudiantDoc.paye) {
         await etudiantDoc.save();
+        console.log('✅ Statut étudiant mis à jour:', ancienStatut, '→', etudiantDoc.paye);
+      } else {
+        console.log('ℹ️ Statut étudiant inchangé:', etudiantDoc.paye);
       }
     }
 
-    res.status(201).json({ 
-      message: 'Paiement ajouté avec succès', 
-      paiement,
-      totalPayeFormation,
-      montantFormationRequis: etudiantDoc ? Math.max(0, etudiantDoc.prixTotal - totalInscription) : 0,
-      modePaiement: etudiantDoc?.modePaiement,
-      typePaiement: typePaymentFinal,
-      numeroTranche: numeroTranche
-    });
+    // Préparer la réponse
+    const response = {
+      message: 'Paiement ajouté avec succès',
+      paiement: {
+        _id: paiement._id,
+        numeroSerie: paiement.numeroSerie,
+        montant: paiement.montant,
+        typePaiement: paiement.typePaiement,
+        numeroTranche: paiement.numeroTranche,
+        moisDebut: paiement.moisDebut,
+        nombreMois: paiement.nombreMois,
+        createdAt: paiement.createdAt
+      },
+      totaux: {
+        totalPayeFormation,
+        totalInscription,
+        montantFormationRequis,
+        resteAPayer: Math.max(0, montantFormationRequis - totalPayeFormation),
+        pourcentagePaye: montantFormationRequis > 0 
+          ? Math.round((totalPayeFormation / montantFormationRequis) * 100) 
+          : 100
+      },
+      etudiant: {
+        id: etudiantDoc._id,
+        nomComplet: etudiantDoc.nomComplet || `${etudiantDoc.prenom} ${etudiantDoc.nomDeFamille}`,
+        modePaiement: etudiantDoc.modePaiement,
+        paye: etudiantDoc.paye
+      }
+    };
+
+    console.log('✅ ===== PAIEMENT CRÉÉ AVEC SUCCÈS =====');
+    console.log('📤 Réponse envoyée:', JSON.stringify(response, null, 2));
+
+    res.status(201).json(response);
+
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    // 🔍 LOG D'ERREUR DÉTAILLÉ
+    console.error('❌ ===== ERREUR LORS DE LA CRÉATION DU PAIEMENT =====');
+    console.error('❌ Type d\'erreur:', err.name);
+    console.error('❌ Message:', err.message);
+    console.error('❌ Code:', err.code);
+    console.error('❌ Stack:', err.stack);
+    
+    // Erreur de duplication (MongoDB code 11000)
+    if (err.code === 11000) {
+      console.error('❌ Erreur de duplication détectée');
+      const field = Object.keys(err.keyPattern || {})[0] || 'champ inconnu';
+      return res.status(400).json({ 
+        error: `Une valeur dupliquée existe déjà pour le champ: ${field}`,
+        details: 'Ce numéro de série existe déjà dans la base de données'
+      });
+    }
+
+    // Erreur de validation Mongoose
+    if (err.name === 'ValidationError') {
+      console.error('❌ Erreur de validation:', err.errors);
+      const errors = Object.values(err.errors).map(e => ({
+        field: e.path,
+        message: e.message
+      }));
+      return res.status(400).json({ 
+        error: 'Erreur de validation',
+        details: errors
+      });
+    }
+
+    // Erreur de cast (ID invalide)
+    if (err.name === 'CastError') {
+      console.error('❌ Erreur de cast:', err.path, err.value);
+      return res.status(400).json({ 
+        error: 'Identifiant invalide',
+        field: err.path,
+        value: err.value
+      });
+    }
+
+    // Erreur générique
+    console.error('❌ Erreur non gérée:', err);
+    res.status(500).json({ 
+      error: 'Erreur serveur lors de l\'ajout du paiement',
+      message: err.message,
+      type: err.name
+    });
   }
 });
 // Nouvelle route API à ajouter dans votre serveur
 // À ajouter dans votre fichier serveur (app.js ou server.js)
+// ============================================
+// ROUTE PUT: Modifier un paiement
+// ============================================
+app.put('/api2/paiements/:id', authAdminOrPaiementManager, async (req, res) => {
+  try {
+    console.log('📝 ===== MODIFICATION PAIEMENT =====');
+    console.log('🆔 ID:', req.params.id);
+    console.log('📦 Données reçues:', JSON.stringify(req.body, null, 2));
+    
+    const { id } = req.params;
+    const { montant, note, numeroSerie, nombreMois, moisDebut } = req.body;
+    
+    // ✅ VALIDATION 1: Vérifier si le paiement existe
+    const paiement = await Paiement.findById(id);
+    if (!paiement) {
+      console.log('❌ Paiement introuvable');
+      return res.status(404).json({ 
+        error: 'Paiement introuvable' 
+      });
+    }
+    
+    console.log('✅ Paiement trouvé:', paiement.numeroSerie);
+    
+    // ✅ VALIDATION 2: Si la série est modifiée, vérifier qu'elle n'existe pas déjà
+    if (numeroSerie && numeroSerie !== paiement.numeroSerie) {
+      const serieFormatee = numeroSerie.trim().toUpperCase();
+      
+      console.log('🔍 Vérification nouvelle série:', serieFormatee);
+      
+      const serieExiste = await Paiement.findOne({ 
+        numeroSerie: serieFormatee,
+        _id: { $ne: id }
+      });
+      
+      if (serieExiste) {
+        console.log('❌ Série déjà utilisée');
+        return res.status(400).json({ 
+          error: `Ce numéro de série (${numeroSerie}) est déjà utilisé par un autre paiement` 
+        });
+      }
+      
+      paiement.numeroSerie = serieFormatee;
+      console.log('✅ Nouvelle série acceptée');
+    }
+    
+    // ✅ VALIDATION 3: Vérifier le montant
+    if (montant !== undefined) {
+      if (parseFloat(montant) <= 0) {
+        console.log('❌ Montant invalide');
+        return res.status(400).json({ 
+          error: 'Le montant doit être supérieur à 0' 
+        });
+      }
+      paiement.montant = parseFloat(montant);
+    }
+    
+    // Mettre à jour les autres champs
+    if (note !== undefined) paiement.note = note;
+    if (nombreMois !== undefined && nombreMois > 0) paiement.nombreMois = parseInt(nombreMois);
+    if (moisDebut !== undefined) paiement.moisDebut = new Date(moisDebut);
+    
+    console.log('💾 Sauvegarde des modifications...');
+    await paiement.save();
+    console.log('✅ Paiement modifié avec succès');
+    
+    // ✅ RECALCULER le statut de l'étudiant
+    const etudiantId = paiement.etudiant;
+    
+    console.log('📊 Recalcul du statut de l\'étudiant...');
+    
+    const paiementsFormation = await Paiement.find({ 
+      etudiant: etudiantId, 
+      $or: [
+        { typePaiement: 'formation' },
+        { estInscription: false }
+      ]
+    });
+    
+    const paiementsInscription = await Paiement.find({ 
+      etudiant: etudiantId, 
+      $or: [
+        { typePaiement: 'inscription' },
+        { estInscription: true }
+      ]
+    });
+    
+    const totalPayeFormation = paiementsFormation.reduce((acc, p) => acc + (p.montant || 0), 0);
+    const totalInscription = paiementsInscription.reduce((acc, p) => acc + (p.montant || 0), 0);
+    
+    const etudiantDoc = await Etudiant.findById(etudiantId);
+    
+    if (etudiantDoc && etudiantDoc.modePaiement !== 'annuel') {
+      const montantFormationRequis = Math.max(0, etudiantDoc.prixTotal - totalInscription);
+      const ancienStatut = etudiantDoc.paye;
+      
+      etudiantDoc.paye = totalPayeFormation >= montantFormationRequis;
+      
+      if (ancienStatut !== etudiantDoc.paye) {
+        await etudiantDoc.save();
+        console.log('✅ Statut étudiant mis à jour:', ancienStatut, '→', etudiantDoc.paye);
+      } else {
+        console.log('ℹ️ Statut étudiant inchangé');
+      }
+    }
+    
+    console.log('✅ ===== MODIFICATION TERMINÉE =====');
+    
+    res.json({ 
+      message: 'Paiement modifié avec succès', 
+      paiement: {
+        _id: paiement._id,
+        numeroSerie: paiement.numeroSerie,
+        montant: paiement.montant,
+        nombreMois: paiement.nombreMois,
+        moisDebut: paiement.moisDebut,
+        note: paiement.note,
+        updatedAt: paiement.updatedAt
+      }
+    });
+    
+  } catch (err) {
+    console.error('❌ ===== ERREUR MODIFICATION =====');
+    console.error('❌ Type:', err.name);
+    console.error('❌ Message:', err.message);
+    console.error('❌ Stack:', err.stack);
+    
+    // Erreur de duplication
+    if (err.code === 11000) {
+      return res.status(400).json({ 
+        error: 'Ce numéro de série existe déjà dans la base de données' 
+      });
+    }
+    
+    // Erreur de validation
+    if (err.name === 'ValidationError') {
+      const errors = Object.values(err.errors).map(e => ({
+        field: e.path,
+        message: e.message
+      }));
+      return res.status(400).json({ 
+        error: 'Erreur de validation',
+        details: errors
+      });
+    }
+    
+    // Erreur de cast (ID invalide)
+    if (err.name === 'CastError') {
+      return res.status(400).json({ 
+        error: 'Identifiant invalide',
+        field: err.path
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Erreur serveur lors de la modification',
+      message: err.message 
+    });
+  }
+});
 
+// ============================================
+// ROUTE DELETE: Supprimer un paiement
+// ============================================
+app.delete('/api2/paiements/:id', authAdminOrPaiementManager, async (req, res) => {
+  try {
+    console.log('🗑️ ===== SUPPRESSION PAIEMENT =====');
+    console.log('🆔 ID:', req.params.id);
+    
+    const { id } = req.params;
+    
+    // ✅ VALIDATION: Vérifier si le paiement existe
+    const paiement = await Paiement.findById(id);
+    if (!paiement) {
+      console.log('❌ Paiement introuvable');
+      return res.status(404).json({ 
+        error: 'Paiement introuvable' 
+      });
+    }
+    
+    console.log('✅ Paiement trouvé:', {
+      numeroSerie: paiement.numeroSerie,
+      montant: paiement.montant,
+      etudiant: paiement.etudiant
+    });
+    
+    const etudiantId = paiement.etudiant;
+    const paiementInfo = {
+      _id: paiement._id,
+      numeroSerie: paiement.numeroSerie,
+      montant: paiement.montant,
+      etudiant: paiement.etudiant,
+      typePaiement: paiement.typePaiement,
+      createdAt: paiement.createdAt
+    };
+    
+    // ✅ SUPPRESSION du paiement
+    console.log('🗑️ Suppression en cours...');
+    await Paiement.findByIdAndDelete(id);
+    console.log('✅ Paiement supprimé');
+    
+    // ✅ RECALCULER le statut de l'étudiant
+    console.log('📊 Recalcul du statut de l\'étudiant...');
+    
+    const paiementsFormation = await Paiement.find({ 
+      etudiant: etudiantId, 
+      $or: [
+        { typePaiement: 'formation' },
+        { estInscription: false }
+      ]
+    });
+    
+    const paiementsInscription = await Paiement.find({ 
+      etudiant: etudiantId, 
+      $or: [
+        { typePaiement: 'inscription' },
+        { estInscription: true }
+      ]
+    });
+    
+    const totalPayeFormation = paiementsFormation.reduce((acc, p) => acc + (p.montant || 0), 0);
+    const totalInscription = paiementsInscription.reduce((acc, p) => acc + (p.montant || 0), 0);
+    
+    console.log('💰 Nouveaux totaux:', {
+      formation: totalPayeFormation,
+      inscription: totalInscription
+    });
+    
+    const etudiantDoc = await Etudiant.findById(etudiantId);
+    
+    if (etudiantDoc && etudiantDoc.modePaiement !== 'annuel') {
+      const montantFormationRequis = Math.max(0, etudiantDoc.prixTotal - totalInscription);
+      const ancienStatut = etudiantDoc.paye;
+      
+      etudiantDoc.paye = totalPayeFormation >= montantFormationRequis;
+      
+      if (ancienStatut !== etudiantDoc.paye) {
+        await etudiantDoc.save();
+        console.log('✅ Statut étudiant mis à jour:', ancienStatut, '→', etudiantDoc.paye);
+      } else {
+        console.log('ℹ️ Statut étudiant inchangé');
+      }
+    }
+    
+    console.log('✅ ===== SUPPRESSION TERMINÉE =====');
+    
+    res.json({ 
+      message: 'Paiement supprimé avec succès',
+      paiementSupprime: paiementInfo,
+      nouveauxTotaux: {
+        totalFormation: totalPayeFormation,
+        totalInscription: totalInscription,
+        resteAPayer: etudiantDoc ? Math.max(0, etudiantDoc.prixTotal - totalInscription - totalPayeFormation) : 0
+      }
+    });
+    
+  } catch (err) {
+    console.error('❌ ===== ERREUR SUPPRESSION =====');
+    console.error('❌ Type:', err.name);
+    console.error('❌ Message:', err.message);
+    console.error('❌ Stack:', err.stack);
+    
+    // Erreur de cast (ID invalide)
+    if (err.name === 'CastError') {
+      return res.status(400).json({ 
+        error: 'Identifiant invalide',
+        field: err.path
+      });
+    }
+    
+    res.status(500).json({ 
+      error: 'Erreur serveur lors de la suppression',
+      message: err.message 
+    });
+  }
+});
 app.get('/api2/revenus/previsions/:anneeScolaire', authAdminOrPaiementManager, async (req, res) => {
   try {
     const anneeScolaire = decodeURIComponent(req.params.anneeScolaire);
@@ -15537,9 +15997,10 @@ app.get('/api2/professeur/mes-etudiants-messages', authProfesseur, async (req, r
     }
 
     // 2. Trouver les étudiants qui ont au moins un cours commun
+    // ✅ CORRECTION: Enlever 'nomComplet' du select et ajouter 'prenom' et 'nomDeFamille'
     const etudiants = await Etudiant.find({
       cours: { $in: professeur.cours }
-    }).select('_id nomComplet email image genre lastSeen cours');
+    }).select('_id prenom nomDeFamille email image genre lastSeen cours');
 
     // 3. Récupérer les messages de ce professeur
     const messages = await Message.find({ professeur: req.professeurId }).sort({ date: -1 });
@@ -15559,10 +16020,13 @@ app.get('/api2/professeur/mes-etudiants-messages', authProfesseur, async (req, r
     }
 
     // 5. Fusionner les données des étudiants avec leur dernier message
-    const result = etudiants.map(etudiant => ({
-      ...etudiant.toObject(),
-      dernierMessage: lastMessagesMap.get(etudiant._id.toString()) || null
-    }));
+    const result = etudiants.map(etudiant => {
+      const etudiantObj = etudiant.toObject({ virtuals: true }); // ✅ Activer les virtuals
+      return {
+        ...etudiantObj,
+        dernierMessage: lastMessagesMap.get(etudiant._id.toString()) || null
+      };
+    });
 
     res.json(result);
   } catch (err) {

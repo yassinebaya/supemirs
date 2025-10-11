@@ -88,16 +88,7 @@ const Sidebar = ({ onLogout }) => {
       label: 'Revenus Mensuels',
       icon: BarChart3
     },
-    {
-      path: '/admin/partners',
-      label: 'Partenaires',
-      icon: Handshake
-    },
-    {
-      path: '/admin/dashboard-partners',
-      label: 'Partenaires',
-      icon: Home
-    },
+   
  
     {
       path: '/liste-classes',
@@ -106,11 +97,7 @@ const Sidebar = ({ onLogout }) => {
     },
 
      
-    {
-      path: '/admin/finance-profs',
-      label: 'Finance Professeurs',
-      icon: Wallet
-    },
+  
   
     {
       path: '/admin/commercial',
@@ -143,6 +130,11 @@ const Sidebar = ({ onLogout }) => {
       path: '/update-profil',
       label: 'Profil',
       icon: Shield,
+    },
+      {
+      path: '/admin/finance-profs',
+      label: 'Finance Professeurs',
+      icon: Wallet
     },
 
   ];
