@@ -93,7 +93,10 @@ import ListeCoursPedagogique from './pages/ListeCoursPedagogique';
 import PartnersPage from './pages/PartnersPage';
 import ProfilEtudiantPedagogique from './pages/ProfilEtudiantPedagogique';
 import ModifierCoursEtudiant from './pages/ModifierCoursEtudiant';
+import GestionAnnonces from './pages/GestionAnnonces'; // ✅ Nouveau composant
 
+
+import EtudiantsSansPrix from './pages/EtudiantsSansPrix'; // ✅ Nouveau composant
    function AppContent() {
      const location = useLocation();
    
@@ -177,6 +180,8 @@ import ModifierCoursEtudiant from './pages/ModifierCoursEtudiant';
         <Route path="/administratif/classes" element={<ListeCoursAdmin />} />
         <Route path="/administratif/etudiants" element={<ListeEtudiantsAdmin />} />
         {/* Routes Admin */}
+
+        <Route path="/manager/etudiants-sans-prix" element={<EtudiantsSansPrix />} />
         <Route path="/liste-etudiants" element={<ListeEtudiants />} />
         <Route path="/ajouter-paiement" element={<AjouterPaiement />} />
         <Route path="/liste-paiements" element={<ListePaiements />} />
@@ -210,7 +215,10 @@ import ModifierCoursEtudiant from './pages/ModifierCoursEtudiant';
 <Route path="/admin/revenus-mensuels" element={<RevenusMensuels />} />
 <Route path="/commercial" element={<Commercial />} />
 
+
+
 <Route path="/assigner-langues" element={<AssignerLangues />} />
+<Route path="/professeur/annonces" element={<GestionAnnonces />} />
 
 <Route path="/pedagogique/etudiants" element={<PedagogiqueEtudiants />} />
 <Route path="/professeur/AjouterBulletin" element={<ProfAjouterBulletin />} />

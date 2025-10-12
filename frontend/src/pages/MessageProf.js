@@ -32,10 +32,10 @@ const UserAvatar = ({ user, size = 48 }) => {
     }
     
     if (imagePath.startsWith('/')) {
-      return `https://vmi1977988.contaboserver.net${imagePath}`;
+      return `http://195.179.229.230:5000${imagePath}`;
     }
     
-    return `https://vmi1977988.contaboserver.net/${imagePath}`;
+    return `http://195.179.229.230:5000/${imagePath}`;
   };
 
   const imageUrl = getImageUrl(user?.image);
@@ -211,7 +211,7 @@ const [audioBlob, setAudioBlob] = useState(null);
       }
 
       try {
-        const response = await fetch('https://vmi1977988.contaboserver.net/api2/professeur/me', {
+        const response = await fetch('http://195.179.229.230:5000/api2/professeur/me', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -240,7 +240,7 @@ const [audioBlob, setAudioBlob] = useState(null);
 
       setIsLoadingEtudiants(true);
       try {
-        const response = await fetch('https://vmi1977988.contaboserver.net/api2/professeur/mes-etudiants-messages', {
+        const response = await fetch('http://195.179.229.230:5000/api2/professeur/mes-etudiants-messages', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -249,6 +249,14 @@ const [audioBlob, setAudioBlob] = useState(null);
         }
         
         const data = await response.json();
+        
+        // ✅ DEBUG: Afficher les données reçues
+        console.log('🔍 Données étudiants reçues:', data);
+        if (data.length > 0) {
+          console.log('🔍 Premier étudiant:', data[0]);
+          console.log('🔍 Champs disponibles:', Object.keys(data[0]));
+        }
+        
         setEtudiants(Array.isArray(data) ? data : []);
         
         // Extraire le dernier message pour chaque étudiant
@@ -276,7 +284,7 @@ const [audioBlob, setAudioBlob] = useState(null);
       if (!token) return;
 
       try {
-        const response = await fetch('https://vmi1977988.contaboserver.net/api2/messages/unread-by-sender', {
+        const response = await fetch('http://195.179.229.230:5000/api2/messages/unread-by-sender', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -298,7 +306,7 @@ const [audioBlob, setAudioBlob] = useState(null);
       if (!token) return;
 
       try {
-        const response = await fetch('https://vmi1977988.contaboserver.net/api2/users/online-status', {
+        const response = await fetch('http://195.179.229.230:5000/api2/users/online-status', {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -326,7 +334,7 @@ const [audioBlob, setAudioBlob] = useState(null);
 
       setIsLoadingMessages(true);
       try {
-        const response = await fetch(`https://vmi1977988.contaboserver.net/api2/messages/professeur/${selectedEtudiant._id}`, {
+        const response = await fetch(`http://195.179.229.230:5000/api2/messages/professeur/${selectedEtudiant._id}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -338,7 +346,7 @@ const [audioBlob, setAudioBlob] = useState(null);
         setMessages(Array.isArray(data) ? data : []);
         
         // Marquer les messages comme lus
-        await fetch('https://vmi1977988.contaboserver.net/api2/messages/mark-conversation-read', {
+        await fetch('http://195.179.229.230:5000/api2/messages/mark-conversation-read', {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -380,7 +388,7 @@ const [audioBlob, setAudioBlob] = useState(null);
     if (fichier) formData.append('fichier', fichier);
 
     try {
-      const response = await fetch('https://vmi1977988.contaboserver.net/api2/messages/upload-prof', {
+      const response = await fetch('http://195.179.229.230:5000/api2/messages/upload-prof', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData
@@ -427,7 +435,7 @@ const [audioBlob, setAudioBlob] = useState(null);
     }
 
     try {
-      const response = await fetch(`https://vmi1977988.contaboserver.net/api2/messages/${messageToDelete}`, {
+      const response = await fetch(`http://195.179.229.230:5000/api2/messages/${messageToDelete}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -488,7 +496,7 @@ const stopRecording = () => {
       formData.append('fichier', file);
 
       try {
-        const response = await fetch('https://vmi1977988.contaboserver.net/api2/messages/upload-prof', {
+        const response = await fetch('http://195.179.229.230:5000/api2/messages/upload-prof', {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
           body: formData
@@ -509,17 +517,54 @@ const stopRecording = () => {
 };
 
 
+  // ✅ Fonction pour construire le nom complet de l'étudiant
+  const getEtudiantName = (etudiant) => {
+    if (!etudiant) return 'Étudiant inconnu';
+    
+    // ✅ DEBUG: Afficher les champs de l'étudiant
+    console.log('🔍 Étudiant reçu:', etudiant);
+    
+    // Essayer différents champs possibles
+    const prenom = etudiant.prenom || '';
+    const nomDeFamille = etudiant.nomDeFamille || etudiant.nom || '';
+    const nomComplet = etudiant.nomComplet || '';
+    const email = etudiant.email || '';
+    
+    console.log('🔍 Champs trouvés:', { prenom, nomDeFamille, nomComplet, email });
+    
+    // Si nomComplet existe, l'utiliser
+    if (nomComplet.trim()) {
+      return nomComplet;
+    }
+    
+    // Sinon, construire avec prenom + nomDeFamille
+    const fullName = `${prenom} ${nomDeFamille}`.trim();
+    if (fullName) {
+      return fullName;
+    }
+    
+    // Fallback sur email si disponible
+    if (email) {
+      return email.split('@')[0]; // Utiliser la partie avant @ de l'email
+    }
+    
+    // Si aucun champ n'est disponible
+    return `Étudiant ${etudiant._id?.slice(-4) || 'inconnu'}`;
+  };
+
   // ✅ Filtrer les étudiants de manière sécurisée
   const filteredEtudiants = etudiants.filter(etudiant => {
     if (!etudiant) return false;
     
-    const nom = etudiant.nom || '';
     const prenom = etudiant.prenom || '';
+    const nomDeFamille = etudiant.nomDeFamille || '';
     const email = etudiant.email || '';
     const classe = etudiant.classe || '';
+    const fullName = getEtudiantName(etudiant);
     
-    return nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    return prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           nomDeFamille.toLowerCase().includes(searchTerm.toLowerCase()) ||
+           fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
            email.toLowerCase().includes(searchTerm.toLowerCase()) ||
            classe.toLowerCase().includes(searchTerm.toLowerCase());
   });
@@ -773,7 +818,7 @@ const stopRecording = () => {
                             color: '#1c1e21', 
                             fontSize: '15px' 
                           }}>
-{etudiant.nomComplet}
+                            {getEtudiantName(etudiant)}
                           </div>
                           {lastMessage && (
                             <div style={{ 
@@ -840,7 +885,7 @@ const stopRecording = () => {
                   <UserAvatar user={selectedEtudiant} size={40} />
                   <div style={{ flex: 1 }}>
                     <h3 style={{ fontSize: '16px', fontWeight: '600', margin: 0, color: '#1c1e21' }}>
-{selectedEtudiant.nomComplet}
+                      {getEtudiantName(selectedEtudiant)}
                     </h3>
                     <div style={{ fontSize: '12px', color: '#65676b' }}>
                       {onlineUsers.has(selectedEtudiant._id) ? (
@@ -916,7 +961,7 @@ const stopRecording = () => {
                               </div>
                             )}
                             {message.fichier && getFileExtension(message.fichier) === 'webm' && (
-  <audio controls src={`https://vmi1977988.contaboserver.net${message.fichier}`} style={{ marginTop: '8px', width: '100%' }} />
+  <audio controls src={`http://195.179.229.230:5000${message.fichier}`} style={{ marginTop: '8px', width: '100%' }} />
 )}
 
                             {/* Fichier attaché */}
@@ -949,7 +994,7 @@ const stopRecording = () => {
                                   </div>
                                 </div>
                                 <a
-                                  href={`https://vmi1977988.contaboserver.net${message.fichier}`}
+                                  href={`http://195.179.229.230:5000${message.fichier}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   style={{

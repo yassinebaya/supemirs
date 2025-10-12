@@ -24,10 +24,10 @@ const DashboardPartners = () => {
       const token = localStorage.getItem('token');
 
       const [etudiantsRes, partnersRes] = await Promise.all([
-        fetch('https://vmi1977988.contaboserver.net/api2/etudiant', {
+        fetch('http://195.179.229.230:5000/api2/etudiant', {
           headers: { Authorization: `Bearer ${token}` }
         }),
-        fetch('https://vmi1977988.contaboserver.net/api2/partners', {
+        fetch('http://195.179.229.230:5000/api2/partners', {
           headers: { Authorization: `Bearer ${token}` }
         })
       ]);

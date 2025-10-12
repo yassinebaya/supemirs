@@ -160,13 +160,13 @@ const fetchData = async () => {
 
     // Fetch all data with error handling for each request
     const [etudiantsRes, commerciauxRes, partnersRes] = await Promise.all([
-      fetch('https://vmi1977988.contaboserver.net/api2/etudiant', {
+      fetch('http://195.179.229.230:5000/api2/etudiant', {
         headers: { Authorization: `Bearer ${token}` }
       }),
-      fetch('https://vmi1977988.contaboserver.net/api2/commerciaux', {
+      fetch('http://195.179.229.230:5000/api2/commerciaux', {
         headers: { Authorization: `Bearer ${token}` }
       }),
-      fetch('https://vmi1977988.contaboserver.net/api2/partners', {
+      fetch('http://195.179.229.230:5000/api2/partners', {
         headers: { Authorization: `Bearer ${token}` }
       })
     ]);
@@ -1075,7 +1075,7 @@ const calculerPreinscriptionsDirectement = (etudiantsData, commerciauxData, anne
     Chiffre d'Affaires {anneeScolaireFilter === 'toutes' ? '' : anneeScolaireFilter}
   </h2>
 
-  <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+ <table style={{ width: '100%', borderCollapse: 'collapse' }}>
     <thead>
       <tr style={{ borderBottom: '2px solid #e5e7eb' }}>
         <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '600', color: '#374151', fontSize: '0.9rem' }}>
@@ -1111,6 +1111,22 @@ const calculerPreinscriptionsDirectement = (etudiantsData, commerciauxData, anne
         </td>
       </tr>
       
+      {/* SOUS-TOTAL - Nouveaux Inscrits + Réinscriptions */}
+      <tr style={{ borderBottom: '2px solid #e5e7eb', backgroundColor: '#fef3c7' }}>
+        <td style={{ padding: '1rem', textAlign: 'center' }}>
+          <strong>Sous-total</strong>
+          <br />
+          <span style={{ fontSize: '1.25rem', color: '#1f2937', fontWeight: '600' }}>
+            {chiffreAffaire.nouveauxInscrits.count + chiffreAffaire.reinscriptions.count}
+          </span>
+        </td>
+        <td style={{ padding: '1rem', textAlign: 'center' }}>
+          <strong style={{ fontSize: '1.05rem' }}>
+            {formatMoney(chiffreAffaire.nouveauxInscrits.ca + chiffreAffaire.reinscriptions.ca)} MAD
+          </strong>
+        </td>
+      </tr>
+
       {/* FIXE - Partners pour 2025/2026 uniquement */}
       {anneeScolaireFilter === '2025/2026' && (
         <tr style={{ borderBottom: '1px solid #f3f4f6', backgroundColor: '#f9fafb' }}>
@@ -1150,7 +1166,6 @@ const calculerPreinscriptionsDirectement = (etudiantsData, commerciauxData, anne
           </strong>
         </td>
       </tr>
-
 
     </tbody>
   </table>

@@ -26,8 +26,8 @@ const AssignerLangues = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       const [resEtudiants, resCours] = await Promise.all([
-        fetch('https://vmi1977988.contaboserver.net/api2/admin/etudiants-tests', config),
-        fetch('https://vmi1977988.contaboserver.net/api2/cours/langues', config)
+        fetch('http://195.179.229.230:5000/api2/admin/etudiants-tests', config),
+        fetch('http://195.179.229.230:5000/api2/cours/langues', config)
       ]);
 
       if (resEtudiants.ok && resCours.ok) {
@@ -51,7 +51,7 @@ const AssignerLangues = () => {
   const assignerCours = async (etudiantId, coursNom) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://vmi1977988.contaboserver.net/api2/etudiants/${etudiantId}/cours-langue`, {
+      const response = await fetch(`http://195.179.229.230:5000/api2/etudiants/${etudiantId}/cours-langue`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ const AssignerLangues = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(
-        `https://vmi1977988.contaboserver.net/api2/etudiants/${etudiantId}/cours-langue/${encodeURIComponent(coursNom)}`,
+        `http://195.179.229.230:5000/api2/etudiants/${etudiantId}/cours-langue/${encodeURIComponent(coursNom)}`,
         {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }

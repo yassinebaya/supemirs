@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './ListeEtudiants.css';
 import SidebarCommercial from '../components/SidebarCommercial';
-
+import { ExportButton } from '../components/ExportExcel';
 import { 
   User, 
   CheckCircle, 
@@ -1371,7 +1371,7 @@ const Commercialetudiants = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://vmi1977988.contaboserver.net/api2/commercial/etudiants', {
+      const res = await axios.get('http://195.179.229.230:5000/api2/commercial/etudiants', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEtudiants(res.data);
@@ -1387,7 +1387,7 @@ const Commercialetudiants = () => {
       const token = localStorage.getItem('token');
       
       // Utiliser la route spécifique aux commerciaux
-      const res = await axios.get('https://vmi1977988.contaboserver.net/api2/commercial/cours', {
+      const res = await axios.get('http://195.179.229.230:5000/api2/commercial/cours', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -1399,7 +1399,7 @@ const Commercialetudiants = () => {
       if (err.response?.status === 404) {
         try {
           const token = localStorage.getItem('token');
-          const res = await axios.get('https://vmi1977988.contaboserver.net/api2/cours', {
+          const res = await axios.get('http://195.179.229.230:5000/api2/cours', {
             headers: { Authorization: `Bearer ${token}` }
           });
           setListeCours(res.data);
@@ -1416,7 +1416,7 @@ const Commercialetudiants = () => {
   const fetchCommerciaux = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://vmi1977988.contaboserver.net/api2/commerciaux', {
+      const res = await axios.get('http://195.179.229.230:5000/api2/commerciaux', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setListeCommerciaux(res.data);
@@ -1429,7 +1429,7 @@ const Commercialetudiants = () => {
   const fetchPartners = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://vmi1977988.contaboserver.net/api2/partners/active-list', {
+      const res = await axios.get('http://195.179.229.230:5000/api2/partners/active-list', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setListePartners(res.data.data || []);
@@ -1897,7 +1897,7 @@ const Commercialetudiants = () => {
           formData.append(key, filesAjout[key]);
         }
       });
-      const response = await axios.post('https://vmi1977988.contaboserver.net/api2/commercial/etudiants', formData, {
+      const response = await axios.post('http://195.179.229.230:5000/api2/commercial/etudiants', formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -1982,7 +1982,7 @@ const Commercialetudiants = () => {
         }
       });
       
-      const response = await axios.put(`https://vmi1977988.contaboserver.net/api2/commercial/etudiants/${etudiantAModifier._id}`, formData, {
+      const response = await axios.put(`http://195.179.229.230:5000/api2/commercial/etudiants/${etudiantAModifier._id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -2007,7 +2007,7 @@ const Commercialetudiants = () => {
   const handleToggleActif = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.patch(`https://vmi1977988.contaboserver.net/api2/commercial/etudiants/${id}/actif`, {}, {
+      const res = await axios.patch(`http://195.179.229.230:5000/api2/commercial/etudiants/${id}/actif`, {}, {
 
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -2022,7 +2022,7 @@ const Commercialetudiants = () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`https://vmi1977988.contaboserver.net/api2/commercial/etudiants/${id}`, {
+      await axios.delete(`http://195.179.229.230:5000/api2/commercial/etudiants/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEtudiants(etudiants.filter(e => e._id !== id));
@@ -2114,30 +2114,38 @@ const Commercialetudiants = () => {
 
       <div className="header" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
         <h2 style={{ width: '100%', textAlign: 'center' }}>Liste des Étudiants</h2>
-        <div className="header-actions">
-          <div className="stats">
-            Total: {etudiantsFiltres.length} étudiants
-          </div>
-          
-          <div className="vue-toggle">
-            <button 
-              onClick={() => setVueMode('tableau')}
-              className={`btn-vue ${vueMode === 'tableau' ? 'active' : ''}`}
-            >
-              Tableau
-            </button>
-            <button 
-              onClick={() => setVueMode('carte')}
-              className={`btn-vue ${vueMode === 'carte' ? 'active' : ''}`}
-            >
-              Cartes
-            </button>
-          </div>
-          
-          <button onClick={openModal} className="btn-ajouter-etudiant">
-            Ajouter un étudiant
-          </button>
-        </div>
+     <div className="header-actions">
+  <div className="stats">
+    Total: {etudiantsFiltres.length} étudiants
+  </div>
+  
+  <div className="vue-toggle">
+    <button 
+      onClick={() => setVueMode('tableau')}
+      className={`btn-vue ${vueMode === 'tableau' ? 'active' : ''}`}
+    >
+      Tableau
+    </button>
+    <button 
+      onClick={() => setVueMode('carte')}
+      className={`btn-vue ${vueMode === 'carte' ? 'active' : ''}`}
+    >
+      Cartes
+    </button>
+  </div>
+  
+  {/* ✨ NOUVEAU BOUTON EXPORT ✨ */}
+  <ExportButton 
+    etudiants={etudiants}
+    listeCommerciaux={listeCommerciaux}
+    listePartners={listePartners}
+    etudiantsFiltres={etudiantsFiltres}
+  />
+  
+  <button onClick={openModal} className="btn-ajouter-etudiant">
+    Ajouter un étudiant
+  </button>
+</div>
       </div>
 
       {/* Section des filtres */}
@@ -2273,7 +2281,7 @@ const Commercialetudiants = () => {
                     <td className="image-colonne">
                       {e.image ? (
                         <img 
-                          src={`https://vmi1977988.contaboserver.net${e.image}`} 
+                          src={`http://195.179.229.230:5000${e.image}`} 
                           alt="etudiant" 
                           className="image-etudiant"
                         />
@@ -2322,7 +2330,7 @@ const Commercialetudiants = () => {
                     <div className="carte-image">
                       {e.image ? (
                         <img 
-                          src={`https://vmi1977988.contaboserver.net${e.image}`} 
+                          src={`http://195.179.229.230:5000${e.image}`} 
                           alt="etudiant" 
                           className="carte-photo"
                         />
@@ -4421,7 +4429,7 @@ const Commercialetudiants = () => {
                   <div className="student-photo">
                     {etudiantSelectionne.image ? (
                       <img 
-                        src={`https://vmi1977988.contaboserver.net${etudiantSelectionne.image}`} 
+                        src={`http://195.179.229.230:5000${etudiantSelectionne.image}`} 
                         alt="étudiant" 
                         className="view-photo"
                       />
@@ -4777,7 +4785,7 @@ const Commercialetudiants = () => {
                       <div className="document-item">
                         <FileText size={16} className="info-icon" />
                         <span>Fichier d'inscription</span>
-                        <a href={`https://vmi1977988.contaboserver.net${etudiantSelectionne.fichierInscrit}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
+                        <a href={`http://195.179.229.230:5000${etudiantSelectionne.fichierInscrit}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
                           Voir
                         </a>
                       </div>
@@ -4786,7 +4794,7 @@ const Commercialetudiants = () => {
                       <div className="document-item">
                         <FileText size={16} className="info-icon" />
                         <span>Original Bac</span>
-                        <a href={`https://vmi1977988.contaboserver.net${etudiantSelectionne.originalBac}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
+                        <a href={`http://195.179.229.230:5000${etudiantSelectionne.originalBac}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
                           Voir
                         </a>
                       </div>
@@ -4795,7 +4803,7 @@ const Commercialetudiants = () => {
                       <div className="document-item">
                         <FileText size={16} className="info-icon" />
                         <span>Relevé de notes</span>
-                        <a href={`https://vmi1977988.contaboserver.net${etudiantSelectionne.releveNotes}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
+                        <a href={`http://195.179.229.230:5000${etudiantSelectionne.releveNotes}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
                           Voir
                         </a>
                       </div>
@@ -4804,7 +4812,7 @@ const Commercialetudiants = () => {
                       <div className="document-item">
                         <IdCard size={16} className="info-icon" />
                         <span>Copie CNI</span>
-                        <a href={`https://vmi1977988.contaboserver.net${etudiantSelectionne.copieCni}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
+                        <a href={`http://195.179.229.230:5000${etudiantSelectionne.copieCni}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
                           Voir
                         </a>
                       </div>
@@ -4813,7 +4821,7 @@ const Commercialetudiants = () => {
                       <div className="document-item">
                         <FileText size={16} className="info-icon" />
                         <span>Passeport</span>
-                        <a href={`https://vmi1977988.contaboserver.net${etudiantSelectionne.passport}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
+                        <a href={`http://195.179.229.230:5000${etudiantSelectionne.passport}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
                           Voir
                         </a>
                       </div>
@@ -4822,7 +4830,7 @@ const Commercialetudiants = () => {
                       <div className="document-item">
                         <FileText size={16} className="info-icon" />
                         <span>DTS Bac+2</span>
-                        <a href={`https://vmi1977988.contaboserver.net${etudiantSelectionne.dtsBac2}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
+                        <a href={`http://195.179.229.230:5000${etudiantSelectionne.dtsBac2}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
                           Voir
                         </a>
                       </div>
@@ -4831,7 +4839,7 @@ const Commercialetudiants = () => {
                       <div className="document-item">
                         <GraduationCap size={16} className="info-icon" />
                         <span>Licence</span>
-                        <a href={`https://vmi1977988.contaboserver.net${etudiantSelectionne.licence}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
+                        <a href={`http://195.179.229.230:5000${etudiantSelectionne.licence}`} target="_blank" rel="noopener noreferrer" className="btn-voir-document">
                           Voir
                         </a>
                       </div>

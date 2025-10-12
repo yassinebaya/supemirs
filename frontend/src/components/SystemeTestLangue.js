@@ -917,7 +917,7 @@ const ComposantTest = ({ langue, questions, testId, onTerminer }) => {
   const sauvegarderReponse = async (questionId, reponseIndex) => {
     try {
       const token = localStorage.getItem('token');
-      await fetch(`https://vmi1977988.contaboserver.net/api2/tests/${testId}/reponse`, {
+      await fetch(`http://195.179.229.230:5000/api2/tests/${testId}/reponse`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
@@ -948,7 +948,7 @@ const ComposantTest = ({ langue, questions, testId, onTerminer }) => {
     setChargement(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://vmi1977988.contaboserver.net/api2/tests/${testId}/terminer`, {
+      const response = await fetch(`http://195.179.229.230:5000/api2/tests/${testId}/terminer`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -1157,7 +1157,7 @@ export default function SystemeTestLangue({ etudiant }) {
     try {
       const token = localStorage.getItem('token');
       
-      const response = await fetch('https://vmi1977988.contaboserver.net/api2/tests/statut', {
+      const response = await fetch('http://195.179.229.230:5000/api2/tests/statut', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1185,7 +1185,7 @@ export default function SystemeTestLangue({ etudiant }) {
     try {
       const token = localStorage.getItem('token');
       
-      const responseTest = await fetch('https://vmi1977988.contaboserver.net/api2/tests/demarrer', {
+      const responseTest = await fetch('http://195.179.229.230:5000/api2/tests/demarrer', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -1196,7 +1196,7 @@ export default function SystemeTestLangue({ etudiant }) {
       const dataTest = await responseTest.json();
       setTestEnCours(dataTest.test);
 
-      const responseQuestions = await fetch(`https://vmi1977988.contaboserver.net/api2/tests/questions/${langue}`, {
+      const responseQuestions = await fetch(`http://195.179.229.230:5000/api2/tests/questions/${langue}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }

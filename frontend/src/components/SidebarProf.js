@@ -101,10 +101,16 @@ const SidebarProf = ({ onLogout }) => {
       icon: Users
     },
     {
+      path: '/professeur/annonces',
+      label: 'Annonces',
+      icon: MessageCircle
+    },
+    {
       path: '/evenements-prof',
       label: 'Événements',
       icon: Calendar
     },
+
     {
       path: '/prof/documents',
       label: 'Mes Documents',

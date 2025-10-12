@@ -136,7 +136,6 @@ const Sidebar = ({ onLogout }) => {
       label: 'Finance Professeurs',
       icon: Wallet
     },
-
   ];
 
   // Navigation items pour pédagogique (limitée)

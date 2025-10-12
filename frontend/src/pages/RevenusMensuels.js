@@ -29,7 +29,7 @@ const RevenusMensuels = () => {
       const token = localStorage.getItem('token');
 
       // Récupérer les étudiants pour avoir les années disponibles
-      const etudiantsRes = await fetch('https://vmi1977988.contaboserver.net/api2/etudiants', {
+      const etudiantsRes = await fetch('http://195.179.229.230:5000/api2/etudiants', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -83,7 +83,7 @@ const RevenusMensuels = () => {
       
       console.log('Appel API avec année:', anneeScolaire, 'encodée:', anneeScolaireEncoded);
       
-      const revenusRes = await fetch(`https://vmi1977988.contaboserver.net/api2/revenus/previsions/${anneeScolaireEncoded}`, {
+      const revenusRes = await fetch(`http://195.179.229.230:5000/api2/revenus/previsions/${anneeScolaireEncoded}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

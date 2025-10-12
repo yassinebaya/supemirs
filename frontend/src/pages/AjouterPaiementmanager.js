@@ -13,7 +13,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-const API_BASE_URL = 'https://vmi1977988.contaboserver.net/api2';
+const API_BASE_URL = 'http://195.179.229.230:5000/api2';
 
 const handleLogout = () => {
   localStorage.removeItem('token');

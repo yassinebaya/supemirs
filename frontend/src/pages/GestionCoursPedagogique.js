@@ -100,7 +100,7 @@ const GestionCoursPedagogique = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://vmi1977988.contaboserver.net/api2/pedagogique/mes-etudiants', {
+      const res = await axios.get('http://195.179.229.230:5000/api2/pedagogique/mes-etudiants', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setEtudiants(res.data);
@@ -150,7 +150,7 @@ const GestionCoursPedagogique = () => {
       setLoadingCours(true);
       const token = localStorage.getItem('token');
       const res = await axios.get(
-        `https://vmi1977988.contaboserver.net/api2/pedagogique/mes-etudiants/${etudiant._id}/cours-compatibles`,
+        `http://195.179.229.230:5000/api2/pedagogique/mes-etudiants/${etudiant._id}/cours-compatibles`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setCoursCompatibles(res.data.coursCompatibles);
@@ -191,7 +191,7 @@ const GestionCoursPedagogique = () => {
       const token = localStorage.getItem('token');
       
       await axios.put(
-        `https://vmi1977988.contaboserver.net/api2/pedagogique/mes-etudiants/${etudiantSelectionne._id}/cours`,
+        `http://195.179.229.230:5000/api2/pedagogique/mes-etudiants/${etudiantSelectionne._id}/cours`,
         { cours: coursSelectionnes },
         { headers: { Authorization: `Bearer ${token}` } }
       );

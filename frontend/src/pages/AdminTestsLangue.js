@@ -39,7 +39,7 @@ const AdminTestsLangue = () => {
   const fetchEtudiants = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('https://vmi1977988.contaboserver.net/api2/admin/etudiants-tests', {
+      const response = await fetch('http://195.179.229.230:5000/api2/admin/etudiants-tests', {
         headers: {
           'Authorization': `Bearer ${token}`
         }

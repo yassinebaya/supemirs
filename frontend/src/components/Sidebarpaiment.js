@@ -93,6 +93,11 @@ const Sidebar = ({ onLogout }) => {
           path: '/manager/validation-paiement',
           label: 'Validation Paiement',
           icon: CheckCircle
+        },
+        {
+          path: '/manager/etudiants-sans-prix',
+          label: 'Étudiants Sans Prix',
+          icon: Users
         }
   ];
 

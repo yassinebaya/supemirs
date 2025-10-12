@@ -25,11 +25,11 @@ const ModifierCoursEtudiant = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       // Charger les données de l'étudiant
-const resEtudiant = await fetch(`https://vmi1977988.contaboserver.net/api2/etudiants/${id}`, config);
+const resEtudiant = await fetch(`http://195.179.229.230:5000/api2/etudiants/${id}`, config);
       const etudiantData = await resEtudiant.json();
       
       // Charger tous les cours disponibles
-      const resCours = await fetch('https://vmi1977988.contaboserver.net/api2/cours', config);
+      const resCours = await fetch('http://195.179.229.230:5000/api2/cours', config);
       const coursData = await resCours.json();
       
       if (resEtudiant.ok && resCours.ok) {
@@ -63,7 +63,7 @@ const resEtudiant = await fetch(`https://vmi1977988.contaboserver.net/api2/etudi
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`https://vmi1977988.contaboserver.net/api2/pedagogique/etudiant/${id}/cours`, {
+      const response = await fetch(`http://195.179.229.230:5000/api2/pedagogique/etudiant/${id}/cours`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

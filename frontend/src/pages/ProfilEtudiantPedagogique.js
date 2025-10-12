@@ -44,13 +44,13 @@ const ProfilEtudiantPedagogique = () => {
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       // Récupération des infos du pédagogique
-      const resPedago = await fetch('https://vmi1977988.contaboserver.net/api2/pedagogique/me', config);
+      const resPedago = await fetch('http://195.179.229.230:5000/api2/pedagogique/me', config);
       if (resPedago.ok) {
         const pedaData = await resPedago.json();
         setPedagogiqueInfo(pedaData);
 
         // Récupération de l'étudiant
-        const resEtudiant = await fetch(`https://vmi1977988.contaboserver.net/api2/etudiants/${id}`, config);
+        const resEtudiant = await fetch(`http://195.179.229.230:5000/api2/etudiants/${id}`, config);
         if (resEtudiant.ok) {
           const etudData = await resEtudiant.json();
           setEtudiant(etudData);
@@ -61,7 +61,7 @@ const ProfilEtudiantPedagogique = () => {
 
           if (access) {
             // Récupération des présences
-            const resPres = await fetch(`https://vmi1977988.contaboserver.net/api2/presences/etudiant/${id}`, config);
+            const resPres = await fetch(`http://195.179.229.230:5000/api2/presences/etudiant/${id}`, config);
             if (resPres.ok) {
               const presData = await resPres.json();
               setPresences(presData);
@@ -188,7 +188,7 @@ const checkAccess = (pedago, etud) => {
             <div style={styles.avatarSection}>
               {etudiant.image ? (
                 <img
-                  src={`https://vmi1977988.contaboserver.net${etudiant.image}`}
+                  src={`http://195.179.229.230:5000${etudiant.image}`}
                   alt="Profil étudiant"
                   style={styles.avatar}
                 />

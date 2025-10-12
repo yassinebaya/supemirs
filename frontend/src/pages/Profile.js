@@ -24,6 +24,276 @@ const handleLogout = () => {
   window.location.href = '/';
 };
 
+// Données du baccalauréat
+const baccalaureatMarocain = [
+  { code: '3A33358100', libelle: 'Bac Arts Appliqués' },
+  { code: '3A33222011', libelle: 'Bac Langue Arabe' },
+  { code: '3A33122010', libelle: 'Bac Lettres' },
+  { code: '3A33122210', libelle: 'Bac Lettres - Option Anglais' },
+  { code: '3A33122310', libelle: 'Bac Lettres - Option Espagnole' },
+  { code: '3A33122110', libelle: 'Bac Lettres - Option Français' },
+  { code: '3A33192010', libelle: 'Bac Lettres- Option Sport Etude' },
+  { code: 'O1', libelle: 'Bac Originel' },
+  { code: '3A33500400', libelle: 'Bac Pro - Art et Techniques du Bois' },
+  { code: '3A33500500', libelle: 'Bac Pro - Construction Métallique' },
+  { code: '3A33500200', libelle: 'Bac Pro - Fabrication Mécanique' },
+  { code: '3A33700300', libelle: 'Bac Pro -Arts Culinaires' },
+  { code: '3A33700100', libelle: 'Bac Pro -Commerce' },
+  { code: '3A33700200', libelle: 'Bac Pro -Comptabilité' },
+  { code: '3A33500600', libelle: 'Bac Pro -Dessin de Bâtiment' },
+  { code: '3A33500700', libelle: 'Bac Pro -Electrotechnique; Equipts. Com' },
+  { code: '3A33500800', libelle: 'Bac Pro -Froid et Conditionnement d\'air' },
+  { code: '3A33501300', libelle: 'Bac pro -Froid industriel' },
+  { code: '3A33700800', libelle: 'Bac Pro -Gestion-Administration' },
+  { code: '3A33500900', libelle: 'Bac Pro -Gros Œuvres du bâtiment' },
+  { code: '3A33700600', libelle: 'Bac Pro -logistique' },
+  { code: '3A33501000', libelle: 'Bac Pro -Maintenance de Véhicules Auto(Voitures)' },
+  { code: '3A33500100', libelle: 'Bac Pro- Maintenance Industielle' },
+  { code: '3A33501100', libelle: 'Bac Pro -Maintenance Informatique et Réseaux' },
+  { code: '3A33700700', libelle: 'Bac pro -Réception hôtel' },
+  { code: '3A33700400', libelle: 'Bac Pro -Services de Restauration' },
+  { code: '3A33700500', libelle: 'Bac Pro -Stylisme Modélisme' },
+  { code: '3A33501200', libelle: 'Bac Pro -Systèmes Electroniques  Numériques' },
+  { code: '3A33501400', libelle: 'Bac Pro.-Energies Renouvelables(Systèmes énergie Solaire)' },
+  { code: '3A33600100', libelle: 'Bac Professionnel - Cond. exploitation agricole' },
+  { code: '3A33500300', libelle: 'Bac Professionnel - Construction Aéronautique' },
+  { code: '3A33142012', libelle: 'Bac Sciences Agricoles' },
+  { code: '3A33222010', libelle: 'Bac Sciences Chariaa' },
+  { code: '3A33334411', libelle: 'Bac Sciences de la gestion Comptable' },
+  { code: '3A33142010', libelle: 'Bac Sciences de la Vie et de la Terre' },
+  { code: '3A33142210', libelle: 'Bac Sciences de la Vie et de la Terre - Option An' },
+  { code: '3A33142310', libelle: 'Bac Sciences de la Vie et de la Terre - Option Es' },
+  { code: '3A33142110', libelle: 'Bac Sciences de la Vie et de la Terre - Option Fr' },
+  { code: '3A33190010', libelle: 'Bac Sciences de la Vie et de la Terre- Option Sport Etude' },
+  { code: '3A33334010', libelle: 'Bac Sciences Economiques' },
+  { code: '3A33394010', libelle: 'Bac Sciences Economiques- Option Sport Etude' },
+  { code: '3A33352200', libelle: 'Bac Sciences et Technologies Electrique' },
+  { code: '3A33352100', libelle: 'Bac Sciences et Technologies Mécanique' },
+  { code: '3A33122011', libelle: 'Bac Sciences Humaines' },
+  { code: '3A33122211', libelle: 'Bac Sciences Humaines - Option Anglais' },
+  { code: '3A33122311', libelle: 'Bac Sciences Humaines - Option Espagnole' },
+  { code: '3A33122111', libelle: 'Bac Sciences Humaines - Option Français' },
+  { code: '3A33192011', libelle: 'Bac Sciences Humaines- Option Sport Etude' },
+  { code: '3A33146010', libelle: 'Bac Sciences Mathématiques A' },
+  { code: '3A33146210', libelle: 'Bac Sciences Mathématiques A - Option Anglais' },
+  { code: '3A33146310', libelle: 'Bac Sciences Mathématiques A - Option Espagnole' },
+  { code: '3A33146110', libelle: 'Bac Sciences Mathématiques A - Option Français' },
+  { code: '3A33146011', libelle: 'Bac Sciences Mathématiques B' },
+  { code: '3A33146211', libelle: 'Bac Sciences Mathématiques B - Option Anglais' },
+  { code: '3A33146311', libelle: 'Bac Sciences Mathématiques B - Option Espagnole' },
+  { code: '3A33146111', libelle: 'Bac Sciences Mathématiques B - Option Français' },
+  { code: '3A33142011', libelle: 'Bac Sciences Physiques' },
+  { code: '3A33142211', libelle: 'Bac Sciences Physiques - Option Anglais' },
+  { code: '3A33142311', libelle: 'Bac Sciences Physiques - Option Espagnole' },
+  { code: '3A33142111', libelle: 'Bac Sciences Physiques - Option Français' },
+  { code: '3A31650000', libelle: 'Tronc commun Professionnel Agricole' },
+  { code: '3A31500000', libelle: 'Tronc commun Professionnel Industiel' }
+];
+
+const baccalaureatEtranger = [
+  { code: 'E10', libelle: 'Economie Bac Pro' },
+  { code: 'E3', libelle: 'Economique' },
+  { code: 'E8', libelle: 'Enseignement Originel' },
+  { code: 'E2', libelle: 'Lettres' },
+  { code: 'E7', libelle: 'Lettres Sciences Humaines' },
+  { code: 'E5', libelle: 'Professionnel' },
+  { code: 'E15', libelle: 'Professionnel Secteur Secondaire' },
+  { code: 'E1', libelle: 'Sciences' },
+  { code: 'E12', libelle: 'Sciences Agricoles' },
+  { code: 'E11', libelle: 'Sciences de la Vie de la Terre' },
+  { code: 'E14', libelle: 'Sciences Mathématiques' },
+  { code: 'E13', libelle: 'Sciences Physiques' },
+  { code: 'E4', libelle: 'Technique' }
+];
+
+// Diplômes d'accès
+const diplomesAcces = [
+  'Diplôme',
+  'Diplôme d\'Etudes Universitaire en Sciences et Techniques',
+  'Brevet de Technicien Supérieur',
+  'Baccalauréat',
+  'Doctorat',
+  'Ancien Master',
+  'Master spécialisé',
+  'Master en Sciences et Techniques',
+  'Licence des études fondamentales',
+  'Diplôme des études universitaires générales',
+  'Ancien Diplôme de docteur en médecine',
+  'Ancien Diplôme de docteur en médecine dentaire',
+  'Diplôme des études générales dans les sciences et techniques',
+  'Ancien Diplôme traducteur',
+  'Ancien Diplôme de docteur en pharmacie',
+  'Ancien Licence en sciences et techniques',
+  'Licence professionnelle',
+  'Ancien Diplôme universitaire de technologie',
+  'Ancien Diplôme des écoles nationales de commerce et gestion',
+  'Ancien Diplôme d\'ingénieur d\'état',
+  'Doctorat',
+  'Diplôme d\'études supérieures approfondies',
+  'Doctorat d\'Etat',
+  'Diplôme d\'études supérieures spécialisées',
+  'Diplôme National de Spécialité d\'Orthodentie',
+  'Diplôme de Spécialité Médicale',
+  'Diplôme des études universitaires professionnelles',
+  'Licence en éducation',
+  'Ancien Diplôme d\'interprète',
+  'Diplôme en traduction audio visuelle',
+  'Diplôme INAU',
+  'Diplôme de Cycle Supérieur de l\'Institut Supérieur International de Tourisme',
+  'Diplôme du Cycle Normal de l\'Institut Supérieur International de Tourisme',
+  'Diplôme de Capitaine au Long Cours',
+  'Cycle fondamental INSAP',
+  'ISCAE-Diplôme du Groupe Institut Supérieur de Commerce et d\'Administration des Entreprises',
+  'Diplôme d\'informatiste',
+  'Diplôme d\'informatiste spécialisé',
+  'Ancien Diplôme des Métiers d\'Art et de Design',
+  'Ancien Diplôme de l\'Ecole Nationale Supérieure d\'Art et de Design',
+  'Brevet de technicien spécialisé',
+  'Bachelor',
+  'Attestation d\'admissibilité au CNC',
+  'Diplôme de technicien spécialisé',
+  'Diplôme de Spécialité Pharmaceutique et Biologique',
+  'Architecte',
+  'Diplôme d\'Administrateur des Affaires Maritimes',
+  'Diplôme de Capitaine Mécanicien de 1ère classe de la Marine Marchande',
+  'Diplôme de Cycle Normal en Information et Communication',
+  'Diplôme de Cycle Supérieur',
+  'Diplôme de Lieutenant au Long Cours',
+  'Diplôme de Lieutenant Mécanicien de 1ère classe de la Marine Marchande',
+  'Diplôme de l\'Institut National des Beaux Arts',
+  'Diplôme du Cycle Normal',
+  'Diplôme National d\'Expert Comptable',
+  'Diplôme Officier Ingénieur d\'Etat',
+  'Diplôme Supérieur de Traduction',
+  'Docteur Vétérinaire',
+  'Docteur Vétérinaire Spécialisé',
+  'Certificat d\'aptitude à l\'enseignement secondaire',
+  'Certificat du deuxième cycle des écoles normales supérieures',
+  'Certificat du cycle supérieur délivré par les écoles normales supérieures',
+  'Classes Préparatoires aux Grandes Ecoles',
+  'Diplôme du Cycle Normal de l\'Institut Supérieur des Etudes Maritimes',
+  'Diplôme du Cycle supérieur de l\'Institut Supérieur des Etudes Maritimes',
+  'Licence Bac + 3 ans',
+  'Bac + 3 ans (S5/S6)',
+  'Master 2 ans après un diplôme "Bac+3ans"',
+  'Diplôme des Etudes Préparatoires en Commerce et Gestion',
+  'Diplôme des écoles nationales de commerce et de gestion',
+  'Diplôme universitaire de technologie',
+  'Diplôme des études Préparatoires en sciences de l\'ingénieur',
+  'Diplôme d\'ingénieur d\'état 5 ans après Baccalauréat en Ingénierie',
+  '2 années Préparatoires en Ingénierie',
+  'Ancien Années Préparatoires',
+  'Licence professionnelle (S5/S6)',
+  'Diplôme de Spécialité Médicale (médiacale)',
+  '3 ans après Bac',
+  '2 ans après "Bac+3ans"',
+  '2 Années Préparatoires au Cycle Ingénieur',
+  '3 ans après "2ans"',
+  'Bac + 5 ans',
+  '5ans après bac réparties en cycle prépa intégré (2ans) et cycle de spécialisation (3ans)',
+  'Bac + 6 ans',
+  '3 ans après "2 Années Préparatoires"',
+  'Bac + 7 ans',
+  'Doctorat',
+  '5 ans après bac ( 2 années préparatoires et 3 ans cycle de spécialisation)',
+  'Bac + 4 ans',
+  '3 ans après Bac(fondamental)',
+  '3 ans après Bac (professionnel)',
+  '2 ans après un diplôme "Bac+3ans" (fondamental)',
+  '2 ans après un diplôme "Bac+3ans" (professionnel)',
+  'INGENIEUR D\'APPLICATION OU EQUIVALENT',
+  'DIPLOME D\'AGREGATION DES ECOLES NATIONALES',
+  'D.E.S.S (DIPLOM D\'ETUDES SUPER. SPECIALISEES)',
+  'D.E.A OU EQUIVALENT'
+];
+
+// Lieux d'obtention Maroc
+const lieuxObtentionMaroc = [
+  'Province',
+  'Préfecture d\'Arrond. Aïn Chock',
+  'Préfecture d\'Arrond. Aïn Sebaa',
+  'Préfecture d\'Arrond. Al Fida Mers',
+  'Préfecture d\'Arrond. Ben M\'sik',
+  'Préfecture d\'Arrond. Casa Anfa',
+  'Préfecture d\'Arrond. Hay Hassani',
+  'Préfecture d\'Arrond. Moulay R\'chid',
+  'Préfecture d\'Arrond. Sidi Bernoussi',
+  'Préfecture: Agadir-Ida -Ou-Tanane',
+  'Préfecture: Fès',
+  'Préfecture: Inezgane- Ait Melloul',
+  'Préfecture: Marrakech',
+  'Préfecture: M\'Diq-Fnideq',
+  'Préfecture: Meknès',
+  'Préfecture: Mohammadia',
+  'Préfecture: Oujda-Angad',
+  'Préfecture: Rabat',
+  'Préfecture: Salé',
+  'Préfecture: Skhirate- Témara',
+  'Préfecture: Tanger-Assilah',
+  'Province: Al  Haouz',
+  'Province: Al Hoceima',
+  'Province: Aousserd',
+  'Province: Assa-Zag',
+  'Province: Azilal',
+  'Province: Béni Mellal',
+  'Province: Benslimane',
+  'Province: Berkane',
+  'Province: Berrechid',
+  'Province: Boujdour',
+  'Province: Boulemane',
+  'Province: Chefchaouen',
+  'Province: Chichaoua',
+  'Province: Chtouka- Ait Baha',
+  'Province: Driouch',
+  'Province: El  Hajeb',
+  'Province: El Jadida',
+  'Province: El Kelâa des  Sraghna',
+  'Province: Errachidia',
+  'Province: Essaouira',
+  'Province: Es-Semara',
+  'Province: Fahs-Anjra',
+  'Province: Figuig',
+  'Province: Fquih Ben Salah',
+  'Province: Guelmim',
+  'Province: Guercif',
+  'Province: Ifrane',
+  'Province: Jerada',
+  'Province: Kénitra',
+  'Province: Khémisset',
+  'Province: Khénifra',
+  'Province: Khouribga',
+  'Province: Laâyoune',
+  'Province: Larache',
+  'Province: Médiouna',
+  'Province: Midelt',
+  'Province: Moulay Yacoub',
+  'Province: Nador',
+  'Province: Nouaceur',
+  'Province: Ouarzazate',
+  'Province: Oued Ed-Dahab',
+  'Province: Ouezzane',
+  'Province: Rehamna',
+  'Province: Safi',
+  'Province: Sefrou',
+  'Province: Settat',
+  'Province: Sidi Bennour',
+  'Province: Sidi Ifni',
+  'Province: Sidi Kacem',
+  'Province: Sidi Slimane',
+  'Province: Tan-Tan',
+  'Province: Taounate',
+  'Province: Taourirt',
+  'Province: Tarfaya',
+  'Province: Taroudannt',
+  'Province: Tata',
+  'Province: Taza',
+  'Province: Tétouan',
+  'Province: Tinghir',
+  'Province: Tiznit',
+  'Province: Youssoufia',
+  'Province: Zagora'
+];
+
 const ProfileEtudiant = () => {
   const [etudiant, setEtudiant] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -31,7 +301,6 @@ const ProfileEtudiant = () => {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   
-  // États pour les champs modifiables
   const [formData, setFormData] = useState({
     telephone: '',
     telephoneResponsable: '',
@@ -57,7 +326,6 @@ const ProfileEtudiant = () => {
   const [selectedDocuments, setSelectedDocuments] = useState({});
   const navigate = useNavigate();
 
-  // Liste des pays
   const listePays = [
     'Maroc', 'France', 'Algérie', 'Tunisie', 'Sénégal', 'Côte d\'Ivoire',
     'Mali', 'Mauritanie', 'Cameroun', 'Gabon', 'Congo', 'Bénin',
@@ -66,15 +334,29 @@ const ProfileEtudiant = () => {
     'Allemagne', 'Italie', 'Portugal', 'Royaume-Uni', 'Pays-Bas'
   ].sort();
 
-  // Types de documents uploadables
-  const typesDocuments = [
-    { key: 'documentCin', label: 'CIN' },
-    { key: 'documentBacCommentaire', label: 'Baccalauréat' },
-    { key: 'documentReleveNoteBac', label: 'Relevé de notes Bac' },
-    { key: 'documentDiplomeCommentaire', label: 'Diplôme' },
-    { key: 'documentAttestationReussiteCommentaire', label: 'Attestation de réussite' },
-    { key: 'documentPasseport', label: 'Passeport' }
-  ];
+  // Types de documents selon le pays
+  const getTypesDocuments = () => {
+    const isMaroc = formData.pays === 'Maroc';
+    
+    const baseDocuments = [
+      { key: 'documentBacCommentaire', label: 'Baccalauréat' },
+      { key: 'documentReleveNoteBac', label: 'Relevé de notes Bac' },
+      { key: 'documentDiplomeCommentaire', label: 'Diplôme' },
+      { key: 'documentAttestationReussiteCommentaire', label: 'Attestation de réussite' }
+    ];
+
+    if (isMaroc) {
+      return [
+        { key: 'documentCin', label: 'CIN' },
+        ...baseDocuments
+      ];
+    } else {
+      return [
+        { key: 'documentPasseport', label: 'Passeport' },
+        ...baseDocuments
+      ];
+    }
+  };
 
   useEffect(() => {
     const role = localStorage.getItem('role');
@@ -91,7 +373,7 @@ const ProfileEtudiant = () => {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch('https://vmi1977988.contaboserver.net/api2/etudiant/profile', {
+      const res = await fetch('http://195.179.229.230:5000/api2/etudiant/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -100,7 +382,6 @@ const ProfileEtudiant = () => {
       const data = await res.json();
       setEtudiant(data);
       
-      // Initialiser formData avec les données existantes
       setFormData({
         telephone: data.telephone || '',
         telephoneResponsable: data.telephoneResponsable || '',
@@ -167,26 +448,23 @@ const ProfileEtudiant = () => {
       const token = localStorage.getItem('token');
       const formDataToSend = new FormData();
 
-      // Ajouter tous les champs modifiables
       Object.keys(formData).forEach(key => {
         if (formData[key]) {
           formDataToSend.append(key, formData[key]);
         }
       });
 
-      // Ajouter l'image si sélectionnée
       if (selectedImage) {
         formDataToSend.append('image', selectedImage);
       }
 
-      // Ajouter les documents si sélectionnés
       Object.keys(selectedDocuments).forEach(key => {
         if (selectedDocuments[key]) {
           formDataToSend.append(key, selectedDocuments[key]);
         }
       });
 
-      const res = await fetch('https://vmi1977988.contaboserver.net/api2/etudiant/mon-profil', {
+      const res = await fetch('http://195.179.229.230:5000/api2/etudiant/mon-profil', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -206,14 +484,12 @@ const ProfileEtudiant = () => {
       setSelectedImage(null);
       setSelectedDocuments({});
       
-      // Réinitialiser les champs de mot de passe
       setFormData(prev => ({
         ...prev,
         nouveauMotDePasse: '',
         motDePasseActuel: ''
       }));
 
-      // Rafraîchir le profil
       setTimeout(() => {
         fetchProfile();
       }, 1000);
@@ -231,7 +507,6 @@ const ProfileEtudiant = () => {
     setSelectedImage(null);
     setSelectedDocuments({});
     setMessage({ type: '', text: '' });
-    // Restaurer les données originales
     if (etudiant) {
       setFormData({
         telephone: etudiant.telephone || '',
@@ -276,6 +551,17 @@ const ProfileEtudiant = () => {
   const getNomComplet = (etudiant) => {
     return `${etudiant.prenom || ''} ${etudiant.nomDeFamille || ''}`.trim();
   };
+
+  // Obtenir le libellé du bac à partir du code
+  const getLibelleBac = (code) => {
+    const bacMaroc = baccalaureatMarocain.find(b => b.code === code);
+    if (bacMaroc) return bacMaroc.libelle;
+    const bacEtranger = baccalaureatEtranger.find(b => b.code === code);
+    if (bacEtranger) return bacEtranger.libelle;
+    return code || 'N/A';
+  };
+
+  const isMaroc = formData.pays === 'Maroc';
 
   if (loading) {
     return (
@@ -339,7 +625,6 @@ const ProfileEtudiant = () => {
         </div>
       </div>
 
-      {/* Message de feedback */}
       {message.text && (
         <div style={{
           ...styles.messageBox,
@@ -351,9 +636,7 @@ const ProfileEtudiant = () => {
         </div>
       )}
 
-      {/* Main Content */}
       <div style={styles.mainContent}>
-        {/* Profile Card */}
         <div style={styles.profileCard}>
           <div style={styles.profileHeader}>
             <div style={styles.avatarContainer}>
@@ -376,7 +659,7 @@ const ProfileEtudiant = () => {
                 />
               ) : etudiant.image ? (
                 <img
-                  src={`https://vmi1977988.contaboserver.net${etudiant.image}`}
+                  src={`http://195.179.229.230:5000${etudiant.image}`}
                   alt="Profil"
                   style={styles.avatar}
                 />
@@ -419,9 +702,8 @@ const ProfileEtudiant = () => {
           </div>
         </div>
 
-        {/* Information Cards */}
         <div style={styles.cardsGrid}>
-          {/* Personal Information */}
+          {/* Informations Personnelles */}
           <div style={styles.infoCard}>
             <div style={styles.cardHeader}>
               <User size={20} color="#4f46e5" />
@@ -541,59 +823,63 @@ const ProfileEtudiant = () => {
               <h3 style={styles.cardTitle}>Documents d'Identité</h3>
             </div>
             <div style={styles.cardContent}>
-              <div style={styles.infoItem}>
-                <FileText size={18} color="#6b7280" />
-                <div style={styles.infoDetails}>
-                  <span style={styles.infoLabel}>CIN</span>
-                  {editMode ? (
-                    <input
-                      type="text"
-                      name="cin"
-                      value={formData.cin}
-                      onChange={handleInputChange}
-                      style={styles.input}
-                    />
-                  ) : (
-                    <span style={styles.infoValue}>{etudiant.cin || 'N/A'}</span>
-                  )}
-                </div>
-              </div>
+              {isMaroc ? (
+                <>
+                  <div style={styles.infoItem}>
+                    <FileText size={18} color="#6b7280" />
+                    <div style={styles.infoDetails}>
+                      <span style={styles.infoLabel}>CIN</span>
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="cin"
+                          value={formData.cin}
+                          onChange={handleInputChange}
+                          style={styles.input}
+                        />
+                      ) : (
+                        <span style={styles.infoValue}>{etudiant.cin || 'N/A'}</span>
+                      )}
+                    </div>
+                  </div>
 
-              <div style={styles.infoItem}>
-                <FileText size={18} color="#6b7280" />
-                <div style={styles.infoDetails}>
-                  <span style={styles.infoLabel}>Code Massar</span>
-                  {editMode ? (
-                    <input
-                      type="text"
-                      name="codeMassar"
-                      value={formData.codeMassar}
-                      onChange={handleInputChange}
-                      style={styles.input}
-                    />
-                  ) : (
-                    <span style={styles.infoValue}>{etudiant.codeMassar || 'N/A'}</span>
-                  )}
+                  <div style={styles.infoItem}>
+                    <FileText size={18} color="#6b7280" />
+                    <div style={styles.infoDetails}>
+                      <span style={styles.infoLabel}>Code Massar</span>
+                      {editMode ? (
+                        <input
+                          type="text"
+                          name="codeMassar"
+                          value={formData.codeMassar}
+                          onChange={handleInputChange}
+                          style={styles.input}
+                        />
+                      ) : (
+                        <span style={styles.infoValue}>{etudiant.codeMassar || 'N/A'}</span>
+                      )}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div style={styles.infoItem}>
+                  <FileText size={18} color="#6b7280" />
+                  <div style={styles.infoDetails}>
+                    <span style={styles.infoLabel}>Passeport</span>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        name="passeport"
+                        value={formData.passeport}
+                        onChange={handleInputChange}
+                        style={styles.input}
+                      />
+                    ) : (
+                      <span style={styles.infoValue}>{etudiant.passeport || 'N/A'}</span>
+                    )}
+                  </div>
                 </div>
-              </div>
-
-              <div style={styles.infoItem}>
-                <FileText size={18} color="#6b7280" />
-                <div style={styles.infoDetails}>
-                  <span style={styles.infoLabel}>Passeport</span>
-                  {editMode ? (
-                    <input
-                      type="text"
-                      name="passeport"
-                      value={formData.passeport}
-                      onChange={handleInputChange}
-                      style={styles.input}
-                    />
-                  ) : (
-                    <span style={styles.infoValue}>{etudiant.passeport || 'N/A'}</span>
-                  )}
-                </div>
-              </div>
+              )}
 
               <div style={styles.infoItem}>
                 <FileText size={18} color="#6b7280" />
@@ -615,7 +901,7 @@ const ProfileEtudiant = () => {
             </div>
           </div>
 
-          {/* Academic Information */}
+          {/* Informations Académiques */}
           <div style={styles.infoCard}>
             <div style={styles.cardHeader}>
               <Award size={20} color="#7c3aed" />
@@ -670,7 +956,7 @@ const ProfileEtudiant = () => {
             </div>
           </div>
 
-          {/* Infos Baccalauréat */}
+          {/* Diplômes Antérieurs */}
           <div style={styles.infoCard}>
             <div style={styles.cardHeader}>
               <Award size={20} color="#059669" />
@@ -682,15 +968,26 @@ const ProfileEtudiant = () => {
                 <div style={styles.infoDetails}>
                   <span style={styles.infoLabel}>Série Baccalauréat</span>
                   {editMode ? (
-                    <input
-                      type="text"
+                    <select
                       name="serieBaccalaureat"
                       value={formData.serieBaccalaureat}
                       onChange={handleInputChange}
                       style={styles.input}
-                    />
+                    >
+                      <option value="">Sélectionnez une série</option>
+                      <optgroup label="Baccalauréat Marocain">
+                        {baccalaureatMarocain.map(bac => (
+                          <option key={bac.code} value={bac.code}>{bac.libelle}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Baccalauréat Étranger">
+                        {baccalaureatEtranger.map(bac => (
+                          <option key={bac.code} value={bac.code}>{bac.libelle}</option>
+                        ))}
+                      </optgroup>
+                    </select>
                   ) : (
-                    <span style={styles.infoValue}>{etudiant.serieBaccalaureat || 'N/A'}</span>
+                    <span style={styles.infoValue}>{getLibelleBac(etudiant.serieBaccalaureat)}</span>
                   )}
                 </div>
               </div>
@@ -701,11 +998,12 @@ const ProfileEtudiant = () => {
                   <span style={styles.infoLabel}>Année Baccalauréat</span>
                   {editMode ? (
                     <input
-                      type="number"
+                      type="text"
                       name="anneeBaccalaureat"
                       value={formData.anneeBaccalaureat}
                       onChange={handleInputChange}
                       style={styles.input}
+                      placeholder="Ex: 2025/2026"
                     />
                   ) : (
                     <span style={styles.infoValue}>{etudiant.anneeBaccalaureat || 'N/A'}</span>
@@ -718,13 +1016,21 @@ const ProfileEtudiant = () => {
                 <div style={styles.infoDetails}>
                   <span style={styles.infoLabel}>Lieu Obtention Diplôme</span>
                   {editMode ? (
-                    <input
-                      type="text"
+                    <select
                       name="lieuObtentionDiplome"
                       value={formData.lieuObtentionDiplome}
                       onChange={handleInputChange}
                       style={styles.input}
-                    />
+                    >
+                      <option value="">Sélectionnez un lieu</option>
+                      {isMaroc ? (
+                        lieuxObtentionMaroc.map(lieu => (
+                          <option key={lieu} value={lieu}>{lieu}</option>
+                        ))
+                      ) : (
+                        <option value="Province étrangère">Province étrangère</option>
+                      )}
+                    </select>
                   ) : (
                     <span style={styles.infoValue}>{etudiant.lieuObtentionDiplome || 'N/A'}</span>
                   )}
@@ -736,13 +1042,17 @@ const ProfileEtudiant = () => {
                 <div style={styles.infoDetails}>
                   <span style={styles.infoLabel}>Diplôme d'Accès</span>
                   {editMode ? (
-                    <input
-                      type="text"
+                    <select
                       name="diplomeAcces"
                       value={formData.diplomeAcces}
                       onChange={handleInputChange}
                       style={styles.input}
-                    />
+                    >
+                      <option value="">Sélectionnez un diplôme</option>
+                      {diplomesAcces.map(diplome => (
+                        <option key={diplome} value={diplome}>{diplome}</option>
+                      ))}
+                    </select>
                   ) : (
                     <span style={styles.infoValue}>{etudiant.diplomeAcces || 'N/A'}</span>
                   )}
@@ -787,9 +1097,9 @@ const ProfileEtudiant = () => {
             </div>
           </div>
 
-          {/* Changement de mot de passe */}
           {editMode && (
             <>
+              {/* Changement de mot de passe */}
               <div style={styles.infoCard}>
                 <div style={styles.cardHeader}>
                   <FileText size={20} color="#dc2626" />
@@ -835,7 +1145,7 @@ const ProfileEtudiant = () => {
                   <h3 style={styles.cardTitle}>Uploader des documents</h3>
                 </div>
                 <div style={styles.cardContent}>
-                  {typesDocuments.map(doc => (
+                  {getTypesDocuments().map(doc => (
                     <div key={doc.key} style={styles.infoItem}>
                       <FileText size={18} color="#6b7280" />
                       <div style={styles.infoDetails}>
@@ -864,7 +1174,7 @@ const ProfileEtudiant = () => {
             </>
           )}
 
-          {/* Courses Information (Non modifiable) */}
+          {/* Mes Classes */}
           <div style={styles.infoCard}>
             <div style={styles.cardHeader}>
               <BookOpen size={20} color="#059669" />
@@ -1284,7 +1594,6 @@ const styles = {
   },
 };
 
-// Add CSS animation
 const styleSheet = document.createElement('style');
 styleSheet.textContent = `
   @keyframes spin {
@@ -1292,7 +1601,7 @@ styleSheet.textContent = `
     100% { transform: rotate(360deg); }
   }
   
-  input:focus {
+  input:focus, select:focus {
     border-color: #4f46e5 !important;
     outline: none;
   }
@@ -1314,4 +1623,4 @@ styleSheet.textContent = `
 `;
 document.head.appendChild(styleSheet);
 
-export default ProfileEtudiant;
+export default ProfileEtudiant

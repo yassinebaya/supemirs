@@ -4,13 +4,15 @@ import {
   UserCheck, AlertTriangle, GraduationCap, TrendingUp,
   BookOpen, Clock, Award, Mail, Phone, UserCircle,
   Target, Activity, Star, CheckSquare, FileText,
-  Database, Wifi, DollarSign, Users, X
+  Database, Wifi, DollarSign, Users, X, AlertCircle,
+  ArrowRight, Shield, FileCheck
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Sidebaretudiant from '../components/sidebaretudiant';
 import Headeretudiant from '../components/Headeretudiant';
 import ModalPaiementExpire from '../components/ModalPaiementExpire';
-import SystemeTestLangue from '../components/SystemeTestLangue'; // Import du système de test
+import SystemeTestLangue from '../components/SystemeTestLangue';
+import ModalAnnonces from '../components/ModalAnnonces';
 
 import './AdminDashboard.css';
 
@@ -37,9 +39,12 @@ const DashboardEtudiant = () => {
   const [error, setError] = useState('');
   const [showWelcomeModal, setShowWelcomeModal] = useState(false);
   
-  // AJOUT : États pour le système de test
+  // États pour le système de test
   const [doitPasserTests, setDoitPasserTests] = useState(false);
   const [chargementTests, setChargementTests] = useState(true);
+  
+  // NOUVEAU : État pour le modal des informations obligatoires
+  const [showInfoObligatoiresModal, setShowInfoObligatoiresModal] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
@@ -62,21 +67,18 @@ const DashboardEtudiant = () => {
 
       console.log('🔄 Début de récupération des données étudiant...');
 
-      // Récupération parallèle des données
       const [profileRes, presencesRes, absencesRes, paiementsRes] = await Promise.all([
-        fetch('https://vmi1977988.contaboserver.net/api2/etudiant/profile', { headers }),
-        fetch('https://vmi1977988.contaboserver.net/api2/etudiant/presences', { headers }),
-        fetch('https://vmi1977988.contaboserver.net/api2/etudiant/absences', { headers }),
-        fetch('https://vmi1977988.contaboserver.net/api2/etudiant/paiements', { headers })
+        fetch('http://195.179.229.230:5000/api2/etudiant/profile', { headers }),
+        fetch('http://195.179.229.230:5000/api2/etudiant/presences', { headers }),
+        fetch('http://195.179.229.230:5000/api2/etudiant/absences', { headers }),
+        fetch('http://195.179.229.230:5000/api2/etudiant/paiements', { headers })
       ]);
 
-      // Vérification des statuts de réponse
       if (!profileRes.ok) throw new Error(`Erreur profil: ${profileRes.status}`);
       if (!presencesRes.ok) throw new Error(`Erreur présences: ${presencesRes.status}`);
       if (!absencesRes.ok) throw new Error(`Erreur absences: ${absencesRes.status}`);
       if (!paiementsRes.ok) throw new Error(`Erreur paiements: ${paiementsRes.status}`);
 
-      // Conversion en JSON
       const etudiantData = await profileRes.json();
       const presences = await presencesRes.json();
       const absences = await absencesRes.json();
@@ -91,18 +93,17 @@ const DashboardEtudiant = () => {
 
       setEtudiant(etudiantData);
 
-      // AJOUT : Vérifier si l'étudiant doit passer les tests
+      // Vérifier si l'étudiant doit passer les tests
       if (etudiantData.nouvelleInscription) {
         try {
-          const resTests = await fetch('https://vmi1977988.contaboserver.net/api2/tests/statut', { headers });
+          const resTests = await fetch('http://195.179.229.230:5000/api2/tests/statut', { headers });
           if (resTests.ok) {
             const dataTests = await resTests.json();
-            // Si pas terminé les deux tests, afficher le système de test
             if (!dataTests.tousTermines) {
               setDoitPasserTests(true);
               setChargementTests(false);
               setLoading(false);
-              return; // Arrêter ici, ne pas continuer à charger le dashboard
+              return;
             }
           }
         } catch (err) {
@@ -112,22 +113,27 @@ const DashboardEtudiant = () => {
       
       setChargementTests(false);
       
-      // Vérifier si le modal a déjà été affiché pour cet utilisateur
-      const modalShown = localStorage.getItem('welcomeModalShownStudent');
-      if (!modalShown) {
-        setShowWelcomeModal(true);
+      // NOUVEAU : Vérifier si le profil est incomplet
+      const profilIncomplet = verifierProfilIncomplet(etudiantData);
+      
+      if (profilIncomplet) {
+        // Toujours afficher le modal si le profil est incomplet
+        setShowInfoObligatoiresModal(true);
+      } else {
+        // Afficher le modal de bienvenue seulement si le profil est complet
+        const modalShown = localStorage.getItem('welcomeModalShownStudent');
+        if (!modalShown) {
+          setShowWelcomeModal(true);
+        }
       }
       
-      // Validation des données
       const presencesValid = Array.isArray(presences) ? presences : [];
       const absencesValid = Array.isArray(absences) ? absences : [];
       const paiementsValid = Array.isArray(paiements) ? paiements : [];
 
-      // Calcul du taux de présence
       const totalSeances = presencesValid.length + absencesValid.length;
       const tauxPresence = totalSeances > 0 ? Math.round((presencesValid.length / totalSeances) * 100) : 0;
 
-      // Recherche des paiements expirés
       const today = new Date();
       const paiementsExpires = paiementsValid.filter(p => {
         if (!p.moisFin) return false;
@@ -135,7 +141,6 @@ const DashboardEtudiant = () => {
         return dateFin < today;
       });
 
-      // Nombre de cours inscrits
       const coursInscrits = Array.isArray(etudiantData.cours) ? etudiantData.cours.length : 0;
 
       const dashboardStats = {
@@ -159,6 +164,23 @@ const DashboardEtudiant = () => {
     }
   };
 
+  // NOUVEAU : Fonction pour vérifier si le profil est incomplet
+  const verifierProfilIncomplet = (etudiant) => {
+    if (!etudiant) return false;
+    
+    // Vérifier les champs obligatoires importants
+    const champsObligatoires = [
+      'dateNaissance',
+      'lieuNaissance',
+      'nationalite',
+      'adresse',
+      'codePostal',
+      'ville'
+    ];
+    
+    return champsObligatoires.some(champ => !etudiant[champ] || etudiant[champ] === '');
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('role');
@@ -169,6 +191,262 @@ const DashboardEtudiant = () => {
   const closeWelcomeModal = () => {
     setShowWelcomeModal(false);
     localStorage.setItem('welcomeModalShownStudent', 'true');
+  };
+
+  // NOUVEAU : Modal pour les informations obligatoires
+  const ModalInfoObligatoires = () => {
+    if (!showInfoObligatoiresModal) return null;
+
+    const handleCompleterProfil = () => {
+      // Ne pas sauvegarder, le modal disparaîtra quand le profil sera complété
+      navigate('/etudiant/profile');
+    };
+
+    const handlePlusTard = () => {
+      setShowInfoObligatoiresModal(false);
+      // Ne pas sauvegarder dans localStorage pour que le modal réapparaisse
+    };
+
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0, 0, 0, 0.6)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+        backdropFilter: 'blur(4px)'
+      }}>
+        <div style={{
+          backgroundColor: 'white',
+          padding: '40px',
+          borderRadius: '20px',
+          boxShadow: '0 25px 70px rgba(0, 0, 0, 0.3)',
+          maxWidth: '600px',
+          width: '90%',
+          position: 'relative',
+          animation: 'slideIn 0.3s ease-out'
+        }}>
+          {/* Badge Important */}
+          <div style={{
+            position: 'absolute',
+            top: '-15px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            backgroundColor: '#dc2626',
+            color: 'white',
+            padding: '8px 24px',
+            borderRadius: '20px',
+            fontSize: '14px',
+            fontWeight: '600',
+            boxShadow: '0 4px 12px rgba(220, 38, 38, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <AlertCircle size={18} />
+            ACTION REQUISE
+          </div>
+
+          {/* Icône principale */}
+          <div style={{
+            textAlign: 'center',
+            marginTop: '20px',
+            marginBottom: '20px'
+          }}>
+            <div style={{
+              display: 'inline-flex',
+              padding: '20px',
+              backgroundColor: '#fef3c7',
+              borderRadius: '50%',
+              marginBottom: '15px'
+            }}>
+              <FileCheck size={48} color="#f59e0b" />
+            </div>
+          </div>
+
+          {/* Titre */}
+          <h2 style={{
+            color: '#1f2937',
+            marginBottom: '20px',
+            fontSize: '26px',
+            fontWeight: '700',
+            textAlign: 'center',
+            lineHeight: '1.3'
+          }}>
+            Complétez vos Informations Obligatoires
+          </h2>
+
+          {/* Message d'avertissement */}
+          <div style={{
+            backgroundColor: '#fef2f2',
+            border: '2px solid #fca5a5',
+            borderRadius: '12px',
+            padding: '20px',
+            marginBottom: '25px'
+          }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: '12px'
+            }}>
+              <Shield size={24} color="#dc2626" style={{ flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <p style={{
+                  color: '#991b1b',
+                  fontSize: '15px',
+                  fontWeight: '600',
+                  marginBottom: '8px',
+                  lineHeight: '1.5'
+                }}>
+                  ⚠️ Informations requises pour votre diplôme
+                </p>
+                <p style={{
+                  color: '#7f1d1d',
+                  fontSize: '14px',
+                  lineHeight: '1.6',
+                  marginBottom: '0'
+                }}>
+                  Les informations de votre profil seront utilisées pour établir votre diplôme officiel. 
+                  Il est de <strong>votre responsabilité</strong> de vous assurer que toutes les données 
+                  sont <strong>exactes et complètes</strong>.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Liste des informations requises */}
+          <div style={{
+            backgroundColor: '#f9fafb',
+            borderRadius: '12px',
+            padding: '20px',
+            marginBottom: '25px'
+          }}>
+            <h3 style={{
+              color: '#374151',
+              fontSize: '16px',
+              fontWeight: '600',
+              marginBottom: '15px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <FileText size={20} color="#3b82f6" />
+              Informations à renseigner :
+            </h3>
+            <ul style={{
+              listStyle: 'none',
+              padding: 0,
+              margin: 0
+            }}>
+              {[
+                'Date et lieu de naissance',
+                'Nationalité',
+                'Adresse complète (rue, code postal, ville)',
+                'Informations de contact vérifiées'
+              ].map((item, index) => (
+                <li key={index} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '10px 0',
+                  borderBottom: index < 3 ? '1px solid #e5e7eb' : 'none',
+                  color: '#4b5563',
+                  fontSize: '14px'
+                }}>
+                  <CheckCircle size={18} color="#10b981" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Note importante */}
+          <div style={{
+            backgroundColor: '#fffbeb',
+            border: '1px solid #fcd34d',
+            borderRadius: '8px',
+            padding: '12px 16px',
+            marginBottom: '25px',
+            fontSize: '13px',
+            color: '#92400e',
+            lineHeight: '1.5'
+          }}>
+            <strong>💡 Important :</strong> Ces informations ne peuvent être modifiées qu'une seule fois. 
+            Assurez-vous de leur exactitude avant validation.
+          </div>
+
+          {/* Boutons d'action */}
+          <div style={{
+            display: 'flex',
+            gap: '12px',
+            flexDirection: 'column'
+          }}>
+            <button
+              onClick={handleCompleterProfil}
+              style={{
+                backgroundColor: '#3b82f6',
+                color: 'white',
+                border: 'none',
+                padding: '16px 24px',
+                borderRadius: '10px',
+                fontSize: '16px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = '#2563eb';
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 16px rgba(59, 130, 246, 0.4)';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = '#3b82f6';
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.3)';
+              }}
+            >
+              Compléter mon profil maintenant
+              <ArrowRight size={20} />
+            </button>
+            
+            <button
+              onClick={handlePlusTard}
+              style={{
+                backgroundColor: 'transparent',
+                color: '#6b7280',
+                border: '2px solid #e5e7eb',
+                padding: '14px 24px',
+                borderRadius: '10px',
+                fontSize: '15px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.borderColor = '#9ca3af';
+                e.target.style.color = '#374151';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.borderColor = '#e5e7eb';
+                e.target.style.color = '#6b7280';
+              }}
+            >
+              Je complèterai plus tard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   // Modal de bienvenue
@@ -291,7 +569,6 @@ const DashboardEtudiant = () => {
     );
   };
 
-  // AJOUT : Affichage du loader pendant la vérification des tests
   if (chargementTests) {
     return (
       <div className="loading-container">
@@ -303,7 +580,6 @@ const DashboardEtudiant = () => {
     );
   }
 
-  // AJOUT : Si l'étudiant doit passer les tests, afficher le système de test
   if (doitPasserTests) {
     return <SystemeTestLangue etudiant={etudiant} />;
   }
@@ -392,8 +668,11 @@ const DashboardEtudiant = () => {
       background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 25%, #f3e8ff 100%)'
     }}>
       <Headeretudiant />
+      <ModalInfoObligatoires />
       <WelcomeModal />
       <ModalPaiementExpire />
+            <ModalAnnonces />
+
       <Sidebaretudiant onLogout={handleLogout} />
 
       <div className="dashboard-container">

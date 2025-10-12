@@ -417,7 +417,7 @@ const Financeseance = () => {
       const token = localStorage.getItem('token');
       
       // Récupérer les cours
-      const resCours = await fetch('https://vmi1977988.contaboserver.net/api2/cours', {
+      const resCours = await fetch('http://195.179.229.230:5000/api2/cours', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (resCours.ok) {
@@ -426,7 +426,7 @@ const Financeseance = () => {
       }
 
       // Récupérer les professeurs
-      const resProfs = await fetch('https://vmi1977988.contaboserver.net/api2/professeurs', {
+      const resProfs = await fetch('http://195.179.229.230:5000/api2/professeurs', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (resProfs.ok) {
@@ -452,7 +452,7 @@ const Financeseance = () => {
       
       console.log('🔍 Récupération séances pour la semaine du:', lundiSemaine);
       
-      const res = await fetch(`https://vmi1977988.contaboserver.net/api2/seances/semaine/${lundiSemaine}`, {
+      const res = await fetch(`http://195.179.229.230:5000/api2/seances/semaine/${lundiSemaine}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -687,13 +687,13 @@ const Financeseance = () => {
 
       let res;
       if (s.typeSeance === 'exception' && s.seanceId) {
-        res = await fetch(`https://vmi1977988.contaboserver.net/api2/seances/${s.seanceId}`, {
+        res = await fetch(`http://195.179.229.230:5000/api2/seances/${s.seanceId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify(payload)
         });
       } else {
-        res = await fetch('https://vmi1977988.contaboserver.net/api2/seances/exception', {
+        res = await fetch('http://195.179.229.230:5000/api2/seances/exception', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify(payload)
@@ -731,7 +731,7 @@ const Financeseance = () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://vmi1977988.contaboserver.net/api2/seances/${seanceId}`, {
+      const res = await fetch(`http://195.179.229.230:5000/api2/seances/${seanceId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -795,7 +795,7 @@ const copierSemainePrecedente = async () => {
     
     console.log('📤 Envoi requête copie:', { lundiDestination: lundiActuel });
     
-    const res = await fetch('https://vmi1977988.contaboserver.net/api2/seances/copier-semaine-precedente', {
+    const res = await fetch('http://195.179.229.230:5000/api2/seances/copier-semaine-precedente', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -876,7 +876,7 @@ const copierSemainePrecedente = async () => {
 
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`https://vmi1977988.contaboserver.net/api2/pedagogique/seances/${seanceId}/rattrapage`, {
+      const res = await fetch(`http://195.179.229.230:5000/api2/pedagogique/seances/${seanceId}/rattrapage`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -900,7 +900,7 @@ const copierSemainePrecedente = async () => {
     try {
       setLoadingStats(true);
       const token = localStorage.getItem('token');
-      const res = await fetch('https://vmi1977988.contaboserver.net/api2/pedagogique/rattrapages/statistiques', {
+      const res = await fetch('http://195.179.229.230:5000/api2/pedagogique/rattrapages/statistiques', {
         headers: { Authorization: `Bearer ${token}` }
       });
       

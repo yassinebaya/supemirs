@@ -35,9 +35,9 @@ const ListeCoursAdmin = () => {
         const config = { headers: { Authorization: `Bearer ${token}` } };
 
         // Corriger les URLs - enlever le port et l'IP
-        const resCours = await fetch('https://vmi1977988.contaboserver.net/api2/cours', config);
-        const resEtudiants = await fetch('https://vmi1977988.contaboserver.net/api2/etudiant', config);
-        const resProfs = await fetch('https://vmi1977988.contaboserver.net/api2/professeurs', config);
+        const resCours = await fetch('http://195.179.229.230:5000/api2/cours', config);
+        const resEtudiants = await fetch('http://195.179.229.230:5000/api2/etudiant', config);
+        const resProfs = await fetch('http://195.179.229.230:5000/api2/professeurs', config);
 
         if (resCours.ok && resEtudiants.ok && resProfs.ok) {
           const coursData = await resCours.json();
@@ -114,7 +114,7 @@ const ListeCoursAdmin = () => {
     try {
       const token = localStorage.getItem('token');
       // Corriger l'URL
-      const response = await fetch('https://vmi1977988.contaboserver.net/api2/cours', {
+      const response = await fetch('http://195.179.229.230:5000/api2/cours', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -159,7 +159,7 @@ const ListeCoursAdmin = () => {
     try {
       const token = localStorage.getItem('token');
       // Corriger l'URL
-      const response = await fetch(`https://vmi1977988.contaboserver.net/api2/cours/${coursASupprimer._id}`, {
+      const response = await fetch(`http://195.179.229.230:5000/api2/cours/${coursASupprimer._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

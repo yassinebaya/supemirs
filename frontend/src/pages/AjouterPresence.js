@@ -37,7 +37,7 @@ const AjouterPresence = () => {
   const loadStudentsAuto = async (coursNom, date, debut, fin) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('https://vmi1977988.contaboserver.net/api2/professeur/etudiants', {
+      const res = await axios.get('http://195.179.229.230:5000/api2/professeur/etudiants', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -73,13 +73,13 @@ const AjouterPresence = () => {
 
         try {
           // ✅ Récupérer d'abord la liste des cours
-          const resCours = await axios.get('https://vmi1977988.contaboserver.net/api2/professeur/mes-cours', {
+          const resCours = await axios.get('http://195.179.229.230:5000/api2/professeur/mes-cours', {
             headers: { Authorization: `Bearer ${token}` }
           });
           setCours(resCours.data);
 
           // ✅ Essayer de chercher la séance actuelle
-          const res = await axios.get('https://vmi1977988.contaboserver.net/api2/seances/actuelle', {
+          const res = await axios.get('http://195.179.229.230:5000/api2/seances/actuelle', {
             headers: { Authorization: `Bearer ${token}` }
           });
 
@@ -101,7 +101,7 @@ const AjouterPresence = () => {
           setSeanceId(seanceActuelle._id);
           
           // ✅ CORRECTION : Récupérer les étudiants avec toutes les infos nécessaires
-          const resEtudiants = await axios.get(`https://vmi1977988.contaboserver.net/api2/seances/${seanceActuelle._id}/etudiants`, {
+          const resEtudiants = await axios.get(`http://195.179.229.230:5000/api2/seances/${seanceActuelle._id}/etudiants`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           
@@ -391,7 +391,7 @@ const AjouterPresence = () => {
       try {
         const token = localStorage.getItem('token');
         
-        const res = await axios.get('https://vmi1977988.contaboserver.net/api2/professeur/etudiants', {
+        const res = await axios.get('http://195.179.229.230:5000/api2/professeur/etudiants', {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -476,7 +476,7 @@ const handleSubmit = async (e) => {
 
   try {
     // Obtenir infos professeur
-    const resProfesseur = await axios.get('https://vmi1977988.contaboserver.net/api2/professeur/profil', {
+    const resProfesseur = await axios.get('http://195.179.229.230:5000/api2/professeur/profil', {
       headers: { Authorization: `Bearer ${token}` }
     });
     const professeurInfo = resProfesseur.data;
@@ -487,7 +487,7 @@ const handleSubmit = async (e) => {
     // Si on a un seanceId (séance automatique), récupérer sa matière
     if (seanceId) {
       try {
-        const resSeance = await axios.get(`https://vmi1977988.contaboserver.net/api2/seances/${seanceId}`, {
+        const resSeance = await axios.get(`http://195.179.229.230:5000/api2/seances/${seanceId}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (resSeance.data && resSeance.data.matiere) {
@@ -511,7 +511,7 @@ const handleSubmit = async (e) => {
 
     // Enregistrer toutes les présences
     const promises = presences.map(pres => 
-      axios.post('https://vmi1977988.contaboserver.net/api2/presences', {
+      axios.post('http://195.179.229.230:5000/api2/presences', {
         etudiant: pres.etudiant,
         cours: selectedCours,
         seanceId: seanceId || null,
